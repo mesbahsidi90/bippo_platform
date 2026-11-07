@@ -7,7 +7,7 @@ create policy read_own_admin_role on public.platform_admins for select to authen
 create function public.is_platform_admin() returns boolean language sql stable security invoker set search_path='' as $$
  select auth.uid() is not null and exists(select 1 from public.platform_admins where user_id=(select auth.uid()));
 $$;
-revoke all on function public.is_platform_admin() from public;
+revoke all on function public.is_platform_admin() from public,anon;
 grant execute on function public.is_platform_admin() to authenticated;
 alter table public.shops add column kind text not null default 'cafe' check(kind in ('cafe','restaurant','other')),
  add column city text not null default '' check(length(city)<=100),
@@ -48,7 +48,7 @@ insert into public.subscriptions(shop_id,plan_id) select shops.id,starter.id fro
 create function public.shop_can_operate(target uuid) returns boolean language sql stable security invoker set search_path='' as $$
  select exists(select 1 from public.shops s join public.subscriptions sub on sub.shop_id=s.id where s.id=target and s.status='active' and sub.status in ('active','trial') and (sub.period_end is null or sub.period_end>now()));
 $$;
-revoke all on function public.shop_can_operate(uuid) from public;
+revoke all on function public.shop_can_operate(uuid) from public,anon;
 grant execute on function public.shop_can_operate(uuid) to authenticated;
 drop policy create_orders on public.orders;
 create policy create_orders on public.orders for insert to authenticated with check(shop_id=(select public.current_shop_id()) and status='preparing' and public.shop_can_operate(shop_id));
@@ -68,7 +68,7 @@ begin
  insert into public.shop_notes(shop_id,notes) values(result,internal_notes) on conflict(shop_id) do update set notes=excluded.notes;
  return result;
 end; $$;
-revoke all on function public.admin_save_shop(uuid,text,text,text,text,uuid,text,timestamptz,text) from public;
+revoke all on function public.admin_save_shop(uuid,text,text,text,text,uuid,text,timestamptz,text) from public,anon;
 grant execute on function public.admin_save_shop(uuid,text,text,text,text,uuid,text,timestamptz,text) to authenticated;
 -- Append-only audit: trigger function is private; clients cannot write audit rows.
 create schema if not exists private;
