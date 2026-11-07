@@ -2,7 +2,7 @@ self.addEventListener('push',event=>event.waitUntil((async()=>{
  let data;try{data=event.data.json();}catch{return;}
  if(data.type!=='ORDER_READY'||!data.ticket)return;
  let url;try{url=new URL(data.url,self.location.origin);}catch{return;}
- if(url.origin!==self.location.origin||url.hash!=='#track/'+data.ticket)return;
+ if(url.origin!==self.location.origin||!['#track/'+data.ticket,'#demo/'+data.ticket].includes(url.hash))return;
  // Display first: client discovery failures must not suppress the alert.
  await self.registration.showNotification(data.title,{
   body:data.body,lang:'ar-DZ',dir:'rtl',icon:'/icon-192.png',badge:'/icon-192.png',
