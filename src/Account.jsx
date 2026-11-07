@@ -1,0 +1,9 @@
+import React,{useState,useEffect} from 'react';
+import {db} from './store';
+import {Brand} from './Landing';
+export default function Account(){
+ const [session,setSession]=useState(null),[password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[saved,setSaved]=useState(false);
+ useEffect(()=>{db?.auth.getSession().then(({data})=>setSession(data.session));const sub=db?.auth.onAuthStateChange((_,s)=>setSession(s));return()=>sub?.data.subscription.unsubscribe();},[]);
+ return <><header className="nav wrap"><Brand/></header><form className="panel login" onSubmit={async e=>{e.preventDefault();if(password!==confirm){setMessage('كلمتا المرور ماشي كيف كيف');return;}setBusy(true);setMessage('');const {error}=await db.auth.updateUser({password});setBusy(false);if(error)setMessage(error.message);else{setSaved(true);setPassword('');setConfirm('');}}}><h1>مرحبا بيك في bippo</h1>{!session?<><p>افتح رابط الدعوة اللي وصلك في البريد باش تفعّل حسابك وتختار كلمة المرور.</p><a className="button" href="#dashboard">تسجيل الدخول</a></>:saved?<><p role="status">تسجّلت كلمة المرور. تقدر تدخل للوحة محلّك.</p><a className="button" href="#dashboard">افتح لوحة المحل</a></>:<><p>اختار كلمة مرور لحسابك. ما تشاركها مع حتى واحد.</p><label>كلمة المرور<input type="password" autoComplete="new-password" minLength={12} required value={password} onChange={e=>setPassword(e.target.value)}/></label><label>عاود كلمة المرور<input type="password" autoComplete="new-password" minLength={12} required value={confirm} onChange={e=>setConfirm(e.target.value)}/></label><small>12 حرف على الأقل</small><button className="button" disabled={busy}>حفظ كلمة المرور</button></>}{message&&<p role="alert" className="error">{message}</p>}</form></>;
+}
+
