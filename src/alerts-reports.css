@@ -3,3 +3,5 @@
 
 .custom-report-range{display:flex;align-items:end;gap:14px;flex-wrap:wrap;padding:18px;background:#edf4e9;border-radius:13px;margin-bottom:22px}.custom-report-range label{font-size:10px;color:#809873}.custom-report-range input{font-size:12px;padding:8px 10px}.custom-report-range .error{flex-basis:100%;font-size:11px}
 
+
+.order-alerts .lock-help{margin:14px 0;font-size:11px;color:#c6e1ce;text-align:right;line-height:1.9}.lock-help summary{cursor:pointer}.lock-help p{font-size:10px;color:#a9c5b3;margin:12px 0}

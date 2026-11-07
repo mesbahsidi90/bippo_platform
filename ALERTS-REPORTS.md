@@ -45,3 +45,20 @@
 - https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay
 - https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/
 - https://supabase.com/docs/guides/database/webhooks
+
+## تحسين قفل الشاشة — 2026-11-07
+
+- اعتماد payload مزدوج: `web_push:8030` و`notification` للتعامل التصريحي في Safari الحديث، والحقول القديمة للتوافق مع العمال المثبتة وAndroid. عند تعذر تشغيل JavaScript يمكن لـSafari الداعم عرض المحتوى الاحتياطي.
+- طلب `silent:false` و`renotify:true` مع tag ثابت واهتزاز، حتى عندما تبدو صفحة الطلب ظاهرة. ظهور الصفحة لا يثبت أن صوت HTML مفعّل، لذلك لا نكتم إشعار النظام تلقائيًا.
+- عرض إشعار النظام قبل البحث عن نوافذ المتصفح؛ فشل البحث أو الرسائل لا يمنع التنبيه.
+- زر تجربة صوت إشعار النظام بعد تفعيل Push. هذه تجربة محلية عبر service worker وليست إثبات تسليم رسالة من الخادم. تجربة القفل الفعلية: طلب جديد، تفعيل إشعارات الخلفية، قفل الشاشة، ثم جاهز من جهاز الموظف.
+- Android: السماح بالإشعارات للموقع والمتصفح، الصوت والاهتزاز وشاشة القفل وعدم الإزعاج. الهاتف شغال ومتصل. لا يلزم إبقاء صفحة الويب ظاهرة بعد تسجيل Push؛ إيقاف المتصفح إجباريًا أو تعطيل إشعاراته/بياناته قد يمنع التسليم.
+- iOS: إضافة للشاشة الرئيسية ثم فتح الأيقونة وتفعيل الإشعارات. صوت النظام مدعوم؛ نمط الاهتزاز المخصص لا يُضمن على Safari.
+- لا توجد وسيلة ويب لفرض رنة مخصصة متواصلة أو تجاوز الصامت/التركيز. الهاتف المطفأ لا يشغّل صوتًا؛ قد يحتفظ مزود Push بالرسالة حتى تشغيله ضمن TTL (ساعة في هذه النسخة).
+- اختبارات آلية: صحة payload الاحتياطي، إشعار مسموع رغم نافذة ظاهرة، عدم تعطله بفشل اكتشاف النوافذ، رفض روابط خارج النطاق/طلب آخر، مع الاختبارات السابقة (13 اختبارًا). لم يحصل تأكيد مادي للرنة/الاهتزاز على هاتف Android من داخل بيئة التطوير.
+
+المصادر الرسمية:
+- https://developer.apple.com/videos/play/wwdc2023/10120/ (الصوت و silent=false)
+- https://webkit.org/blog/16535/meet-declarative-web-push/ (fallback دون JavaScript)
+- https://web.dev/articles/push-notifications-notification-behaviour (renotify، silent، vibration)
+- https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers (TTL و urgency)
