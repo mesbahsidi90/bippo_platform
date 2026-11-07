@@ -2,7 +2,7 @@
 
 Arabic RTL restaurant order calling MVP built with React, Vite, Tailwind and Supabase.
 
-Production: https://bippo-platform.mesbahzin89.workers.dev
+Production: https://bippo-platform.pages.dev
 
 ## Local development
 
@@ -19,7 +19,7 @@ The repository includes `.env.production` containing only the Supabase public UR
 
 ## Production
 
-Cloudflare Workers static assets serves `dist/`. Current deployment was uploaded from the dashboard. GitHub pushes do not automatically deploy yet. Future authenticated CLI deployment: build, then use Wrangler with `wrangler.jsonc`, or upload `dist/` through the Cloudflare dashboard.
+Cloudflare Pages project `bippo-platform` serves `dist/`. Current deployment was uploaded from the dashboard. GitHub pushes do not automatically deploy yet. Future authenticated CLI deployment: run `npm run build` then `npx wrangler pages deploy dist --project-name bippo-platform`, or upload `dist/` through the Cloudflare Pages dashboard.
 
 Supabase project: `kdvtqlqiervznhzbpjcx`. Initial schema `supabase/setup.sql` has already been applied to production. Do not rerun it on the live database. Staff accounts must be added to `memberships` by an administrator; public signup does not grant access. Each staff account belongs to one shop.
 
