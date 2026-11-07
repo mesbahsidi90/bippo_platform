@@ -1,9 +1,10 @@
+import Brand from './Brand';
 import React,{useState,useEffect,useRef} from 'react';
 import {Check,Plus,ArrowLeft,ScanLine,ChefHat,Monitor,Clock,ShieldCheck,Keyboard,Plug,Smartphone,CheckCheck} from 'lucide-react';
 import DotNumber from './DotNumber';
 import LiveDemo from './LiveDemo';
 
-export function Brand(){return <a href="#" className="brand" aria-label="bippo — الرئيسية"><span className="brand-mark"><span/><span/><span/><span/><span/><span/><span/><span/><span/></span><b>bippo</b></a>}
+export {default as Brand} from './Brand';
 const jump=id=>e=>{e.preventDefault();document.getElementById(id)?.scrollIntoView({behavior:'smooth'});};
 function Phone({ready=false,compact=false}){return <div className={'reference-phone '+(compact?'compact':'')} aria-label="معاينة صفحة الزبون"><div className="island"/><div className="mock-shop"><span><ChefHat size={16}/></span>مقهى الرّواق</div><div className={'mock-ticket '+(ready?'ready':'')}><small>طلبك رقم</small><DotNumber value="57"/><h4>{ready?'طلبك راه واجد ✓':'رانا نحضّرولك طلبك'}</h4><p>{ready?'طلبك واجد، تقدر تجي تديه':'كي يوجد طلبك، الحالة تتبدّل هنا'}</p>{ready?<span className="mock-success"><Check size={13}/> رانا نستناوك في الكونتوار</span>:<div className="waiting-dots">•••••</div>}</div><div className="mock-powered">ساهلة مع bippo</div><div className="home-indicator"/></div>}
 function MiniOrder({ready=false,onClick}){return <div className="mini-order"><div className="mini-title"><b>لوحة الطلبات</b><span>مقهى الرّواق</span></div><div className="mini-body"><DotNumber value="57"/><div><b>{ready?'واجد للاستلام':'راه يتحضّر'}</b><small><Smartphone size={13}/> متابعة من صفحة الطلب</small></div></div>{onClick?<button className="button full" onClick={onClick}>الطلب راه واجد <Check size={16}/></button>:!ready?<a className="button full" href="#try" onClick={jump('try')}>جرّب زر «جاهز»</a>:<div className="mini-badges"><span><Check/> جاهز</span><span><CheckCheck/> تحديث الصفحة</span><span className="green"><Monitor/> شاشة العرض</span></div>}</div>}

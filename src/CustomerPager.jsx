@@ -1,4 +1,5 @@
 import React from 'react';
+import Brand from './Brand';
 import {Check} from 'lucide-react';
 import DotNumber from './DotNumber';
 import './customer-pager.css';
@@ -14,6 +15,6 @@ export default function CustomerPager({branding,number,status,acknowledged=false
    {error&&<p className="pager-connection" role="status">{number?'الاتصال راه يتعاود…':error}</p>}
   </main>
   {!calling&&extra&&<aside className="pager-extra">{extra}</aside>}
-  {!calling&&<footer className="pager-powered">ساهلة مع <a href="#">bippo<span aria-hidden="true">●</span></a>{demo&&<small>تجربة بلا حساب</small>}</footer>}
+  {!calling&&<footer className="pager-powered">ساهلة مع <Brand/>{demo&&<small>تجربة بلا حساب</small>}</footer>}
  </div>;
 }
