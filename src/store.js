@@ -3,6 +3,7 @@ import { normalizeNumber, validTransition, active } from './domain';
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const cloud = Boolean(url && key);
+export const authLinkError = new URLSearchParams(location.hash.slice(1)).get('error_description');
 export const db = cloud ? createClient(url, key) : null;
 const STORAGE = 'nawba-demo-v1';
 const seed = [101,102,103].map((number,i)=>({id:crypto.randomUUID(),token:crypto.randomUUID(),number:String(number),status:i===0?'ready':'preparing',created_at:new Date().toISOString()}));
