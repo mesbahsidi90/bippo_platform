@@ -62,3 +62,10 @@
 - https://webkit.org/blog/16535/meet-declarative-web-push/ (fallback دون JavaScript)
 - https://web.dev/articles/push-notifications-notification-behaviour (renotify، silent، vibration)
 - https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers (TTL و urgency)
+
+## تكرار الاهتزاز والنغمة الواضحة
+- الرنة داخل الصفحة تستعمل order-alert-v2.wav: نغمة ثلاثية أصلية بترددات واضحة 880/1175/1397 هرتز، مستوى ثابت مع بدايات ونهايات ناعمة دون قص الإشارة.
+- الاهتزاز نبضات متكررة كل ثانيتين طوال جلسة الصوت (20 ثانية كحد أقصى). يتوقف مع pause/ended/error والإيقاف والاستلام وإلغاء تركيب المكوّن. تجربة الصوت تهتز طوال العينة أيضًا.
+- إشعار الخلفية يظل تحت تحكم Android ولا يمكن تشغيل حلقة اهتزاز JavaScript موثوقة أثناء قفل الشاشة. التكرار المتزامن هنا للرنة داخل الصفحة.
+- أضيفت تعليمات لإعادة السماح بإشعارات Chrome عند ظهور permission denied، وزر إعادة تحقق يعيد تحميل الصفحة بعد تعديل الأذونات.
+- نجحت اختبارات تكرار الاهتزاز وإيقاف المؤقت وعدم تكراره عند إعادة البدء، ومعالجة الأجهزة غير الداعمة؛ الإجمالي 15 اختبارًا.
