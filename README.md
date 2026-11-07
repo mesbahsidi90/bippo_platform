@@ -34,3 +34,11 @@ Customer and display pages refresh every two seconds; the staff dashboard also u
 ## Design
 
 bippo uses a teal, mint and apricot palette with Algerian Arabic copy. The how-it-works section pins a single phone visual while text steps scroll and change its state. Reduced-motion preferences are respected.
+
+## Platform administration
+
+Live admin console: https://bippo-platform.pages.dev/#admin
+
+The approved administration schema in `supabase/admin.sql` and explicit anonymous-function access restriction have been applied to production. The designated platform owner has been granted admin access. Sign in with the owner account; the staff dashboard shows an administration link only to authorized admins. Do not rerun the setup SQL on the live database.
+
+The console manages shops, manual subscriptions, plans/prices, existing Auth-user memberships and append-only administrative audit. It does not collect payments or create Auth users. Internal shop notes have their own admin-only RLS table. Suspended shops and expired/cancelled/past-due subscriptions cannot create new orders; existing orders can still be completed. Browser users cannot grant themselves admin roles. See `ADMIN-REVIEW.md` for verification details.
