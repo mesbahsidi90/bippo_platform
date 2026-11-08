@@ -1,6 +1,7 @@
 import {cloud,db} from './store';
+import {reviewUrl} from './guestExperience';
 const key='bippo-shop-settings';
-export const defaults={name:'محلي',city:'',address:'',pickup_message:'تقدر تجي تديه من الكونتوار.',logo:''};
+export const defaults={name:'محلي',city:'',address:'',pickup_message:'تقدر تجي تديه من الكونتوار.',logo:'',google_review_url:''};
 export async function getSettings(){
  if(!cloud)return {...defaults,...JSON.parse(localStorage.getItem(key)||'{}')};
  const {data:id,error}=await db.rpc('current_shop_id');if(error)throw error;if(!id)throw new Error('حسابك ما راهوش مربوط بمحل.');
@@ -9,7 +10,7 @@ export async function getSettings(){
  return {...defaults,...shop.data,...profile.data,shop_id:id};
 }
 export async function saveSettings(value){
- const data={name:value.name.trim(),city:value.city.trim(),address:value.address.trim(),pickup_message:value.pickup_message.trim(),logo:value.logo};
+ const data={name:value.name.trim(),city:value.city.trim(),address:value.address.trim(),pickup_message:value.pickup_message.trim(),logo:value.logo,google_review_url:reviewUrl(value.google_review_url||'')};
  if(!data.name||data.name.length>100)throw new Error('دخل اسم المحل، حتى 100 حرف.');
  if(!cloud){localStorage.setItem(key,JSON.stringify(data));return data;}
  const {error}=await db.from('shop_settings').upsert({...data,shop_id:value.shop_id},{onConflict:'shop_id'});if(error)throw error;return {...data,shop_id:value.shop_id};
