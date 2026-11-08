@@ -4,7 +4,7 @@ import {ArrowUpLeft} from 'lucide-react';
 import './public-pages.css';
 export const footerGroups=[
  ['bippo',[['كيفاش تخدم؟','how'],['جرّبها في هاتفك','try'],['إنشاء حساب','signup'],['تسجيل الدخول','dashboard']]],
- ['لمحلّك',[['للمقاهي','cafes'],['للمطاعم','restaurants']]],
+ ['لمحلّك',[['للمقاهي','cafes'],['للمطاعم','restaurants'],['قارن مع جهاز النداء','bipeur']]],
  ['نعاونـوك',[['دليل الاستعمال','guide'],['تواصل معنا','contact']]],
  ['ثقة ووضوح',[['سياسة الخصوصية','privacy'],['شروط الاستعمال','terms']]],
 ];

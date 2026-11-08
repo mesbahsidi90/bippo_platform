@@ -1,5 +1,6 @@
-export const publicRoutes=['guide','cafes','restaurants','contact','privacy','terms'];
+export const publicRoutes=['bipeur','guide','cafes','restaurants','contact','privacy','terms'];
 export const pageInfo={
+ bipeur:{title:'bippo ولا جهاز نداء الزبائن (Bipeur)؟',tag:'قارن حلول النداء',intro:'شوف الفرق بين الطريقتين، واحسب تكلفة السنة الأولى بالدينار حسب أسعارك وظروف محلك.'},
  guide:{title:'أول طلب في bippo؟ ساهلة.',tag:'دليل الاستعمال',intro:'من فتح الحساب حتى يدي الزبون طلبو. نمشيو معاك خطوة بخطوة.'},
  cafes:{title:'خلّي الكونتوار للقهوة، ماشي للزحمة.',tag:'bippo للمقاهي',intro:'الإسبريسو، القهوة بالحليب ولا طلب المجموعة: كل طلب بنمرتو، والزبون يتبعو من تليفونو.'},
  restaurants:{title:'الطلب يوجد. والزبون يكون على بالو.',tag:'bippo للمطاعم',intro:'للسناك، الفاست فود وطلبات السفري. نظّم الاستلام من التحضير حتى يدي الزبون طلبو.'},
