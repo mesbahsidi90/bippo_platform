@@ -18,4 +18,3 @@ export default function DotNumber({value,className=''}) {
  chars.forEach((c,i)=>{const pattern=glyphs[c]||glyphs['0'];pattern.forEach((row,y)=>row.split('').forEach((on,col)=>points.push(<circle key={`${i}-${y}-${col}`} cx={x+col+0.5} cy={y+0.5} r=".36" fill="currentColor" opacity={on==='1'?1:.075}/>)));x+=c===':'?3:6;});
  return <svg className={'dot-number '+className} viewBox={`0 0 ${width} 7`} role="img" aria-label={String(value)}>{points}</svg>;
 }
-
