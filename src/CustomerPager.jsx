@@ -1,10 +1,11 @@
 import {pickupText} from "./i18n.js";
 import { t as bippoT } from "./i18n.js";
-import React from 'react';
+import React,{lazy,Suspense} from 'react';
 import Brand from './Brand';
 import { Check } from 'lucide-react';
 import DotNumber from './DotNumber';
 import './customer-pager.css';
+const WaitingGame=lazy(()=>import('./WaitingGame'));
 export default function CustomerPager({
   branding,
   number,
@@ -31,6 +32,7 @@ export default function CustomerPager({
    {acknowledged && status === 'ready' ? <div className="pager-confirmed"><Check size={22} />{bippoT(" راني جاي، الرنة حبست")}</div> : children}
    {error && <p className="pager-connection" role="status">{number ? bippoT("الاتصال راه يتعاود…") : error}</p>}
   </main>
+  {number && status==='preparing' && !error && <Suspense fallback={null}><WaitingGame key={number}/></Suspense>}
   {!calling && extra && <aside className="pager-extra">{extra}</aside>}
   {!calling && <footer className="pager-powered">{bippoT("ساهلة مع ")}<Brand />{demo && <small>{bippoT("تجربة بلا حساب")}</small>}</footer>}
  </div>;
