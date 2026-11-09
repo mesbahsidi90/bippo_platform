@@ -1,0 +1,10 @@
+.merchant-alert-card {
+  background: #fff;
+  border: 1px solid #dfe6df;
+  border-radius: 18px;
+  padding: 16px;
+}
+.merchant-alert-card h3 { margin: 0 0 7px; font-size: 1.05rem; }
+.merchant-alert-card p { margin: 0 0 10px; font-size: .86rem; color: #49645a; }
+.merchant-alert-tones { display: flex; flex-wrap: wrap; gap: 7px; }
+.merchant-alert-tones button[aria-pressed=true] { color: #fff; background: #10423a; border-color: #10423a; }

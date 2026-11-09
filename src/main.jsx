@@ -264,7 +264,7 @@ function Customer({
   try {
     review = reviewUrl(o?.google_review_url || '');
   } catch {}
-  return <CustomerPager branding={branding} number={o?.number} status={o?.status} acknowledged={ack || Boolean(o?.coming_at)} loading={!o && !last && !error} error={error || (!o && last ? bippoT("راجع موظف المحل باش يعطيك رابط الطلب.") : '')} extra={o?.status === 'collected' ? <ReviewCard url={review} /> : confirmError ? <p className="guest-confirm-error" role="status">{confirmError}</p> : null}>{o && <OrderAlerts ticket={token} status={o.status} offline={Boolean(error)} onEnabled={() => void report('sound_enabled')} onPushEnabled={() => void report('push_enabled')} onAcknowledge={acknowledge} onRefresh={() => window.dispatchEvent(new Event('nawba-change'))} />}</CustomerPager>;
+  return <CustomerPager branding={branding} number={o?.number} status={o?.status} acknowledged={ack || Boolean(o?.coming_at)} loading={!o && !last && !error} error={error || (!o && last ? bippoT("راجع موظف المحل باش يعطيك رابط الطلب.") : '')} extra={o?.status === 'collected' ? <ReviewCard url={review} /> : confirmError ? <p className="guest-confirm-error" role="status">{confirmError}</p> : null}>{o && <OrderAlerts ticket={token} status={o.status} tone={branding?.alert_tone || 'pager'} offline={Boolean(error)} onEnabled={() => void report('sound_enabled')} onPushEnabled={() => void report('push_enabled')} onAcknowledge={acknowledge} onRefresh={() => window.dispatchEvent(new Event('nawba-change'))} />}</CustomerPager>;
 }
 function Display({
   token

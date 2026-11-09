@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Bell, Check, Smartphone } from 'lucide-react';
 import { cloud, db } from './store';
 import { createVibrationLoop } from './vibration';
+import { toneSource } from './alertTones';
 import { createOrderAudio, handleReadyPush } from './orderAudio';
 import { createAlertSession } from './alertSession';
 const base = import.meta.env.VITE_SUPABASE_URL,
@@ -56,6 +57,7 @@ export default function OrderAlerts({
   onRefresh,
   offline = false,
   demo = false,
+  tone,
   onEnabled,
   onPushEnabled,
   onAcknowledge
@@ -83,7 +85,7 @@ export default function OrderAlerts({
     if (push === 'enabled') callbacks.current.onPushEnabled?.();
   }, [push]);
   useEffect(() => {
-    const audio = createOrderAudio('/order-alert-v2.wav');
+    const audio = createOrderAudio(toneSource(tone));
     audio.loop = true;
     audio.volume = 1;
     const vibration = createVibrationLoop(pattern => navigator.vibrate?.(pattern));
@@ -112,11 +114,11 @@ export default function OrderAlerts({
       current.dispose();
       session.current = null;
     };
-  }, [ticket]);
+  }, [ticket, tone]);
   useEffect(() => {
     session.current?.setReady(status === 'ready');
     if (status === 'collected') session.current?.acknowledge();
-  }, [ticket, status]);
+  }, [ticket, status, tone]);
   useEffect(() => {
     if (!cloud) {
       setPush('local');
@@ -145,6 +147,7 @@ export default function OrderAlerts({
         await pushRequest('subscribe', {
           ticket,
           demo,
+          language,
           subscription: subscription.toJSON()
         });
         if (live) setPush('enabled');
@@ -170,7 +173,8 @@ export default function OrderAlerts({
       await pushRequest('subscribe', {
         ticket,
         demo,
-        subscription: subscription.toJSON()
+        language,
+          subscription: subscription.toJSON()
       });
       setPush('enabled');
     } catch {

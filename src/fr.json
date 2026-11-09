@@ -1027,5 +1027,17 @@
   "إعدادات الفرع": "Paramètres de l’établissement",
   "فرع جديد": "Nouvel établissement",
   "شغّال": "Actif",
-  "اختار طلب باش تعرض الكود": "Choisissez une commande pour afficher son code"
+  "اختار طلب باش تعرض الكود": "Choisissez une commande pour afficher son code",
+  "صوت التنبيه": "Son de l’alerte",
+  "نص التنبيه": "Texte de la notification",
+  "بيجر": "Bipeur",
+  "ماريمبا": "Marimba",
+  "كريستال": "Cristal",
+  "العنوان بالعربية": "Titre en arabe",
+  "العنوان بالفرنسية": "Titre en français",
+  "النص بالعربية": "Texte en arabe",
+  "النص بالفرنسية": "Texte en français",
+  "اختار الرنة واضغط عليها باش تسمعها قبل الحفظ.": "Cliquez sur une sonnerie pour l’écouter avant l’enregistrement.",
+  "خلّي الحقل فارغ للنص الافتراضي. استعمل {number} لرقم الطلب و{venue} لاسم الفرع.": "Laissez le champ vide pour utiliser le texte par défaut. {number} correspond au numéro et {venue} au nom de l’établissement.",
+  "تعذر سماع الرنة. عاود المحاولة.": "Impossible de lire la sonnerie. Réessayez."
 }

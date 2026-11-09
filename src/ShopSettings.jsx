@@ -5,6 +5,7 @@ import { cloud, db } from './store';
 import { getSettings, saveSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { rememberBranch } from './merchantBranches';
+import MerchantAlertSettings from './MerchantAlertSettings';
 import './shop-settings.css';
 export default function ShopSettings({ onSaved, branchOnly = false }) {
   const [form, setForm] = useState(null),
@@ -63,7 +64,7 @@ export default function ShopSettings({ onSaved, branchOnly = false }) {
      : bippoT('الزبون يمسح QR من تيكي الطلب ويفتح طلبه مباشرة.')}</p>
  </section>
  <div className="shop-settings-grid"><label>{bippoT("اسم المحل")}<input required maxLength={100} value={form.name} onChange={e => update('name', e.target.value)} /></label><label>{bippoT("المدينة")}<input maxLength={100} value={form.city} onChange={e => update('city', e.target.value)} /></label></div>
- <label>{bippoT("عنوان المحل")}<input maxLength={200} value={form.address} onChange={e => update('address', e.target.value)} /></label><button className="button" disabled={busy}><Save size={18} /> {busy ? bippoT("نحفظو…") : bippoT("حفظ الإعدادات")}</button>{message && <p role="status" className="notice">{message}</p>}
+ <label>{bippoT("عنوان المحل")}<input maxLength={200} value={form.address} onChange={e => update('address', e.target.value)} /></label><MerchantAlertSettings form={form} update={update} busy={busy} /><button className="button" disabled={busy}><Save size={18} /> {busy ? bippoT("نحفظو…") : bippoT("حفظ الإعدادات")}</button>{message && <p role="status" className="notice">{message}</p>}
  </form>}{!branchOnly && <div className="shop-account"><h3>{bippoT("الحساب")}</h3>{email && <p dir="ltr">{email}</p>}{cloud && <a className="button outline" href="#account">{bippoT("تغيير كلمة المرور")}</a>}<button className="button logout-button" disabled={busy} onClick={async () => {
         setBusy(true);
         setError('');

@@ -2,6 +2,7 @@ import { t as bippoT } from "./i18n.js";
 import { cloud, db } from './store';
 import { shopActivity } from './shopActivities';
 import { cleanCustomerOptions, themeKey } from './customerThemes';
+import { toneKey } from './alertTones';
 import { reviewUrl } from './guestExperience';
 const key = 'bippo-shop-settings';
 export const defaults = {
@@ -17,7 +18,9 @@ export const defaults = {
   banner_text: '',
   banner_image: '',
   customer_options: {},
-  customer_background_image: ''
+  customer_background_image: '',
+  alert_tone: 'pager',
+  alert_copy: {}
 };
 export async function getSettings() {
   if (!cloud) return {
@@ -53,6 +56,11 @@ export async function saveSettings(value) {
     banner_image: value.banner_image || '',
     customer_options: cleanCustomerOptions(value.customer_options),
     customer_background_image: value.customer_background_image || '',
+    alert_tone: toneKey(value.alert_tone),
+    alert_copy: Object.fromEntries(['ar_title', 'fr_title', 'ar_body', 'fr_body'].flatMap(key => {
+      const text = typeof value.alert_copy?.[key] === 'string' ? value.alert_copy[key].trim() : '';
+      return text ? [[key, text.slice(0, key.endsWith('_title') ? 65 : 145)]] : [];
+    })),
     google_review_url: reviewUrl(value.google_review_url || ''),
     tracking_mode: value.tracking_mode === 'counter' ? 'counter' : 'order'
   };
