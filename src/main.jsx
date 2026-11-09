@@ -23,6 +23,7 @@ import { DemoCustomer } from './LiveDemo';
 import CustomerPager from './CustomerPager';
 import './alerts-reports.css';
 import './signup-links.css';
+import './merchant-login.css';
 import LanguageSwitcher from './LanguageSwitcher';
 import Receipt from './Receipt';
 import { shopActivity, shopTypes } from './shopActivities';
@@ -103,26 +104,61 @@ function Dashboard() {
     });
     return () => data.subscription.unsubscribe();
   }, []);
-  return <>{cloud && !session && <header className="nav wrap"><Brand linked={false} />{authReady && <a className="button outline small" href="#signup">{bippoT("إنشاء حساب")}</a>}</header>}{!authReady ? <p className="wrap">{bippoT("جارٍ الاتصال…")}</p> : cloud && !session ? <Login /> : <Orders Share={Share} />}</>;
+  if (!authReady) return <main className="merchant-login"><p role="status">{bippoT('جارٍ الاتصال…')}</p></main>;
+  return cloud && !session ? <Login /> : <Orders Share={Share} />;
 }
+
 function Login() {
-  const [email, setEmail] = useState(''),
-    [password, setPassword] = useState(''),
-    [error, setError] = useState(''),
-    [busy, setBusy] = useState(false);
-  return <form className="panel login" onSubmit={async e => {
-    e.preventDefault();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event) {
+    event.preventDefault();
     setBusy(true);
-    const {
-      error
-    } = await db.auth.signInWithPassword({
-      email,
-      password
-    });
-    setError(error ? bippoT("تعذر الدخول. تحقق من البريد وكلمة المرور.") : '');
-    setBusy(false);
-  }}><span className="eyebrow">{bippoT("مساحة فريقك")}</span><h1>{bippoT("أهلًا بعودتك")}</h1><p>{bippoT("الدخول متاح لصاحب المحل والموظفين المصرح لهم.")}</p><label>{bippoT("البريد الإلكتروني")}<input type="email" autoComplete="username" value={email} required onChange={e => setEmail(e.target.value)} /></label><label>{bippoT("كلمة المرور")}<input type="password" autoComplete="current-password" value={password} required onChange={e => setPassword(e.target.value)} /></label><button className="button" disabled={busy}>{bippoT("دخول")}</button><div className="signup-prompt"><span>{bippoT("جديد في bippo؟")}</span><a className="button outline full" href="#signup">{bippoT("إنشاء حساب جديد للمحل")}</a></div><a className="recovery-back" href="#reset">{bippoT("ما حطّيتش كلمة مرور؟ ولا نسيتها؟")}</a>{error && <p role="alert" className="error">{error}</p>}</form>;
+    setError('');
+    try {
+      const result = await db.auth.signInWithPassword({ email: email.trim(), password });
+      if (result.error) throw result.error;
+    } catch {
+      setError(bippoT('تعذر الدخول. تحقق من البريد وكلمة المرور.'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main className="merchant-login">
+      <div className="merchant-login-content">
+        <Brand />
+        <h1>{bippoT('أهلًا بعودتك')}</h1>
+        <p>{bippoT('ادخل بالبريد الإلكتروني وكلمة المرور تاع حسابك.')}</p>
+        <form onSubmit={submit} aria-busy={busy}>
+          <label>
+            {bippoT('البريد الإلكتروني')}
+            <input type="email" name="email" dir="ltr" autoComplete="username"
+              placeholder="nom@exemple.com" value={email} required onChange={e => setEmail(e.target.value)} />
+          </label>
+          <label>
+            {bippoT('كلمة المرور')}
+            <input type="password" name="password" dir="ltr" autoComplete="current-password"
+              value={password} required onChange={e => setPassword(e.target.value)} />
+          </label>
+          {error && <p role="alert" className="error">{error}</p>}
+          <button className="button" disabled={busy || !email.trim() || !password}>
+            {busy ? bippoT('جارٍ الاتصال…') : bippoT('دخول')}
+          </button>
+        </form>
+        <div className="merchant-login-links">
+          <a href="#reset">{bippoT('نسيت كلمة المرور؟')}</a>
+          <a href="#signup">{bippoT('إنشاء حساب')}</a>
+        </div>
+      </div>
+    </main>
+  );
 }
+
 function Share({
   order,
   close
