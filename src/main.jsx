@@ -25,6 +25,7 @@ import './alerts-reports.css';
 import './signup-links.css';
 import LanguageSwitcher from './LanguageSwitcher';
 import Receipt from './Receipt';
+import { shopActivity, shopTypes } from './shopActivities';
 import CounterTicket from './CounterTicket';
 import { trackingCode } from './counterAccess.js';
 import ReviewCard from './ReviewCard';
@@ -50,7 +51,7 @@ function App() {
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
   }, []);
-  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={token === 'other' ? 'other' : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
+  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={Object.hasOwn(shopTypes, token) ? token : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
 }
 function useLive(loader, deps = []) {
   const [data, setData] = useState(null),
@@ -145,7 +146,7 @@ function Share({
       document.removeEventListener('keydown', esc);
     };
   }, []);
-  return <div className="modal" onClick={close}><section role="dialog" aria-modal="true" aria-label={bippoT("مشاركة الطلب")} className="panel share" onClick={e => e.stopPropagation()}><button autoFocus className="close icon-button" onClick={close} aria-label={bippoT("إغلاق")}><X /></button><h2>{bippoT("طلب ")}{order.number}</h2>{code ? <>
+  return <div className="modal" onClick={close}><section role="dialog" aria-modal="true" aria-label={bippoT("مشاركة الطلب")} className="panel share" onClick={e => e.stopPropagation()}><button autoFocus className="close icon-button" onClick={close} aria-label={bippoT("إغلاق")}><X /></button><h2>{branding && !shopActivity(branding.kind).foodService ? bippoT('تيكي ') : bippoT('طلب ')}{order.number}</h2>{code ? <>
       <p>{bippoT('الزبون يمسح QR الثابت ويدخل هذا الكود.')}</p>
       <strong className="counter-code" dir="ltr">{code}</strong>
     </> : <>

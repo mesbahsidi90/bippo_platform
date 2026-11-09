@@ -907,5 +907,17 @@
   "للتعديلات السريعة في نفس النهار، كيما تقصير السروال وتبديل السحّاب.": "Pour les retouches rapides dans la journée, comme un ourlet ou un changement de fermeture.",
   "سجّل التعديل": "Enregistrez la retouche",
   "كي يخلّي الزبون القطعة، سجّل نمرة التيكي واعطيلو رمز المتابعة.": "Au dépôt du vêtement, saisissez le numéro du ticket et remettez le code de suivi au client.",
-  "التعديل راه واجد للاستلام.": "Votre retouche est prête à être retirée."
+  "التعديل راه واجد للاستلام.": "Votre retouche est prête à être retirée.",
+  "فود كورت": "Espace de restauration",
+  "مغسلة ملابس": "Pressing ou blanchisserie",
+  "مغسلة سيارات": "Station de lavage auto",
+  "خياط": "Couturier ou retoucheur",
+  "المحلات والأنشطة": "Établissements et activités",
+  "إدارة التيكيات": "Gestion des tickets",
+  "تيكي جديد": "Nouveau ticket",
+  "رقم التيكي": "Numéro du ticket",
+  "زيد التيكي": "Ajouter le ticket",
+  "أحدث التيكيات": "Derniers tickets",
+  "تيكي": "Ticket",
+  "تيكي متابعة الخدمة": "Ticket de suivi du service"
 }

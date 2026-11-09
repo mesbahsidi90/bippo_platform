@@ -5,7 +5,7 @@ import { Brand } from './Landing';
 import { cloud, db } from './store';
 import { isAdmin, loadAdmin, saveShop, savePlan, saveMember, removeMember, shopTypes, subStates, expired, operating } from './adminData';
 import './admin.css';
-const nav = [['overview', bippoT("نظرة عامة"), LayoutDashboard], ['shops', bippoT("المقاهي والمطاعم"), Store], ['subscriptions', bippoT("الاشتراكات"), CreditCard], ['plans', bippoT("الخطط والأسعار"), Layers], ['team', bippoT("حسابات المحلات"), Users], ['activity', bippoT("سجل التغييرات"), History]];
+const nav = [['overview', bippoT("نظرة عامة"), LayoutDashboard], ['shops', bippoT('المحلات والأنشطة'), Store], ['subscriptions', bippoT("الاشتراكات"), CreditCard], ['plans', bippoT("الخطط والأسعار"), Layers], ['team', bippoT("حسابات المحلات"), Users], ['activity', bippoT("سجل التغييرات"), History]];
 const formatDate = d => d ? new Date(d).toLocaleDateString(bippoLocale) : bippoT("بدون تاريخ نهاية");
 const money = (p, c = 'DZD') => p === null ? bippoT("السعر غير محدد") : new Intl.NumberFormat(bippoLocale, {
   style: 'currency',

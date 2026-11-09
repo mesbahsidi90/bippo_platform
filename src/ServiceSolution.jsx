@@ -31,7 +31,7 @@ export default function ServiceSolution({ info }) {
         <span className="public-kicker"><Check size={16} />{t('اضبط رسالة الاستلام')}</span>
         <h2>{info.pickup}</h2>
         <p>{t('هذا مثال تقدر تحطّو في «رسالة الاستلام للزبون» في إعدادات المحل.')}</p>
-        <a className="button" href="#signup/other">{t('إنشاء حساب')}</a>
+        <a className="button" href={"#signup/" + info.kind}>{t('إنشاء حساب')}</a>
       </div>
     </section>
   );

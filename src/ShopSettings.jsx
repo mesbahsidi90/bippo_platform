@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { LogOut, Save, ImagePlus } from 'lucide-react';
 import { cloud, db } from './store';
 import { getSettings, saveSettings, readLogo } from './shopSettings';
+import { shopActivity } from './shopActivities';
 import { CounterPoster } from './CounterTicket';
 import './shop-settings.css';
 export default function ShopSettings() {
@@ -50,6 +51,7 @@ export default function ShopSettings() {
       }
     }}>
  <section className="shop-review-section">
+   <p>{bippoT("نوع النشاط")} · <strong>{shopActivity(form.kind).label}</strong></p>
    <label>{bippoT('طريقة متابعة الطلب')}
      <select disabled={busy} value={form.tracking_mode} onChange={e => update('tracking_mode', e.target.value)}>
        <option value="order">{bippoT('QR لكل طلب (افتراضي)')}</option>

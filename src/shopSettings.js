@@ -1,5 +1,6 @@
 import { t as bippoT } from "./i18n.js";
 import { cloud, db } from './store';
+import { shopActivity } from './shopActivities';
 import { reviewUrl } from './guestExperience';
 const key = 'bippo-shop-settings';
 export const defaults = {
@@ -9,6 +10,7 @@ export const defaults = {
   pickup_message: bippoT("تقدر تجي تديه من الكونتوار."),
   logo: '',
   google_review_url: '',
+  kind: 'cafe',
   tracking_mode: 'order'
 };
 export async function getSettings() {
@@ -22,12 +24,13 @@ export async function getSettings() {
   } = await db.rpc('current_shop_id');
   if (error) throw error;
   if (!id) throw new Error(bippoT("حسابك ما راهوش مربوط بمحل."));
-  const [profile, shop] = await Promise.all([db.from('shop_settings').select('*').eq('shop_id', id).maybeSingle(), db.from('shops').select('name,city').eq('id', id).single()]);
+  const [profile, shop] = await Promise.all([db.from('shop_settings').select('*').eq('shop_id', id).maybeSingle(), db.from('shops').select('name,city,kind').eq('id', id).single()]);
   if (profile.error) throw profile.error;
   if (shop.error) throw shop.error;
   return {
     ...defaults,
     ...shop.data,
+    tracking_mode: shopActivity(shop.data.kind).trackingMode,
     ...profile.data,
     shop_id: id
   };
@@ -44,8 +47,8 @@ export async function saveSettings(value) {
   };
   if (!data.name || data.name.length > 100) throw new Error(bippoT("دخل اسم المحل، حتى 100 حرف."));
   if (!cloud) {
-    localStorage.setItem(key, JSON.stringify(data));
-    return data;
+    localStorage.setItem(key, JSON.stringify({ ...data, kind: value.kind }));
+    return { ...data, kind: value.kind };
   }
   const {
     error
@@ -58,7 +61,8 @@ export async function saveSettings(value) {
   if (error) throw error;
   return {
     ...data,
-    shop_id: value.shop_id
+    shop_id: value.shop_id,
+    kind: value.kind
   };
 }
 export async function ticketBranding(ticket) {

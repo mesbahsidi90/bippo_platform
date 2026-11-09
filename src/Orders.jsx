@@ -6,6 +6,8 @@ import { statuses } from './domain';
 import DotNumber from './DotNumber';
 import Reports from './Reports';
 import ShopSettings from './ShopSettings.jsx';
+import { getSettings } from './shopSettings';
+import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
 import { retryPush } from './OrderAlerts';
 import { staffSignals } from './guestApi';
@@ -23,7 +25,8 @@ export default function Orders({
     [filter, setFilter] = useState('all'),
     [tab, setTab] = useState('orders'),
     [pushFailed, setPushFailed] = useState(null),
-    [signalsUnavailable, setSignalsUnavailable] = useState(false);
+    [signalsUnavailable, setSignalsUnavailable] = useState(false),
+    [activity, setActivity] = useState(() => shopActivity('cafe'));
   useEffect(() => {
     let alive = true;
     async function load() {
@@ -48,6 +51,9 @@ export default function Orders({
         if (alive) setError(e.message);
       }
     }
+    getSettings().then(shop => {
+      if (alive) setActivity(shopActivity(shop.kind));
+    }).catch(() => {});
     load();
     const stop = subscribe(load);
     return () => {
@@ -80,7 +86,7 @@ export default function Orders({
   }
   const rows = orders || [],
     visible = rows.filter(o => filter === 'all' || (filter === 'active' ? o.status !== 'collected' : o.status === filter));
-  return <main className="wrap dashboard"><div className="dashboard-title"><div><span className="eyebrow">{bippoT("مساحة العمل")}</span><h1>{bippoT("إدارة الطلبات ")}<span className="live"><span className="dot" />{bippoT(" مباشر")}</span></h1><p>{cloud ? bippoT("آخر 200 طلب · السجل الكامل والإحصاءات في التقارير") : bippoT("وضع تجريبي · البيانات في هذا المتصفح فقط")}</p></div></div><div className="dashboard-tabs"><button className={tab === 'orders' ? 'selected' : ''} onClick={() => setTab('orders')}><List size={17} />{bippoT(" الطلبات")}</button><button className={tab === 'reports' ? 'selected' : ''} onClick={() => setTab('reports')}><BarChart3 size={17} />{bippoT(" السجل والتقارير")}</button><button className={tab === 'settings' ? 'selected' : ''} onClick={() => setTab('settings')}><Settings size={17} />{bippoT(" الإعدادات")}</button></div>{tab === 'settings' ? <ShopSettings /> : tab === 'reports' ? <Reports /> : <><div className="stats">{[[bippoT("راه يتحضّر"), rows.filter(o => o.status === 'preparing').length, Clock], [bippoT("واجد للاستلام"), rows.filter(o => o.status === 'ready').length, Check], [bippoT("تسلّم وبقى في السجل"), rows.filter(o => o.status === 'collected').length, CheckCheck]].map(([label, n, Icon]) => <div className="stat" key={label}><Icon size={22} /><span>{label}</span><strong>{n}</strong></div>)}</div><div className="work-grid"><section className="panel new-order"><span className="round-icon"><Plus /></span><h2>{bippoT("طلب جديد")}</h2><p>{bippoT("دخل النمرة اللي راهي في تيكي الزبون.")}</p><form onSubmit={async e => {
+  return <main className="wrap dashboard"><div className="dashboard-title"><div><span className="eyebrow">{bippoT("مساحة العمل")}</span><h1>{(activity.foodService ? bippoT('إدارة الطلبات ') : bippoT('إدارة التيكيات '))}<span className="live"><span className="dot" />{bippoT(" مباشر")}</span></h1><p>{cloud ? bippoT("آخر 200 طلب · السجل الكامل والإحصاءات في التقارير") : bippoT("وضع تجريبي · البيانات في هذا المتصفح فقط")}</p></div></div><div className="dashboard-tabs"><button className={tab === 'orders' ? 'selected' : ''} onClick={() => setTab('orders')}><List size={17} />{bippoT(" الطلبات")}</button><button className={tab === 'reports' ? 'selected' : ''} onClick={() => setTab('reports')}><BarChart3 size={17} />{bippoT(" السجل والتقارير")}</button><button className={tab === 'settings' ? 'selected' : ''} onClick={() => setTab('settings')}><Settings size={17} />{bippoT(" الإعدادات")}</button></div>{tab === 'settings' ? <ShopSettings /> : tab === 'reports' ? <Reports /> : <><div className="stats">{[[bippoT("راه يتحضّر"), rows.filter(o => o.status === 'preparing').length, Clock], [bippoT("واجد للاستلام"), rows.filter(o => o.status === 'ready').length, Check], [bippoT("تسلّم وبقى في السجل"), rows.filter(o => o.status === 'collected').length, CheckCheck]].map(([label, n, Icon]) => <div className="stat" key={label}><Icon size={22} /><span>{label}</span><strong>{n}</strong></div>)}</div><div className="work-grid"><section className="panel new-order"><span className="round-icon"><Plus /></span><h2>{(activity.foodService ? bippoT('طلب جديد') : bippoT('تيكي جديد'))}</h2><p>{bippoT("دخل النمرة اللي راهي في تيكي الزبون.")}</p><form onSubmit={async e => {
             e.preventDefault();
             setBusy(true);
             setNotice('');
@@ -94,7 +100,7 @@ export default function Orders({
             } finally {
               setBusy(false);
             }
-          }}><label>{bippoT("رقم الطلب")}<input placeholder={bippoT("مثلًا 104")} inputMode="numeric" maxLength={4} value={number} onChange={e => setNumber(e.target.value)} required /></label><button className="button full" disabled={busy}><Plus size={18} />{bippoT(" زيد الطلب")}</button></form><small>{bippoT("ما نحتاجوش اسم الزبون ولا نمرة تليفونو.")}</small></section><section className="panel order-list"><div className="list-heading"><div><h2>{bippoT("أحدث الطلبات")}</h2><p className="history-hint">{bippoT("المستلمة تبقى ظاهرة ومحفوظة.")}</p><p className="guest-status-legend">{bippoT("حالات الزبون تسجّل آخر تفاعل، ماشي ضمان أنه سمع الرنة.")}</p></div><select aria-label={bippoT("تصفية الطلبات")} value={filter} onChange={e => setFilter(e.target.value)}><option value="all">{bippoT("كل الحالات")}</option><option value="active">{bippoT("الطلبات النشطة")}</option><option value="preparing">{bippoT("راه يتحضّر")}</option><option value="ready">{bippoT("واجد للاستلام")}</option><option value="collected">{bippoT("تسلّم الطلب")}</option></select></div>{error && <p className="error" role="alert">{bippoT("تعذر التحديث: ")}{error}{bippoT(" — نعاودو الاتصال تلقائيًا.")}</p>}{!orders ? <p>{bippoT("نحمّلو الطلبات…")}</p> : visible.map(o => <div className={'order-row ' + o.status} key={o.id}><div className="order-number"><DotNumber value={o.number} /></div><div className="order-detail"><span className={'status ' + o.status}>{statuses[o.status]}</span><small>{new Date(o.created_at).toLocaleString(bippoLocale, {
+          }}><label>{(activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي'))}<input placeholder={bippoT("مثلًا 104")} inputMode="numeric" maxLength={4} value={number} onChange={e => setNumber(e.target.value)} required /></label><button className="button full" disabled={busy}><Plus size={18} />{(activity.foodService ? bippoT(' زيد الطلب') : bippoT(' زيد التيكي'))}</button></form><small>{bippoT("ما نحتاجوش اسم الزبون ولا نمرة تليفونو.")}</small></section><section className="panel order-list"><div className="list-heading"><div><h2>{(activity.foodService ? bippoT('أحدث الطلبات') : bippoT('أحدث التيكيات'))}</h2><p className="history-hint">{bippoT("المستلمة تبقى ظاهرة ومحفوظة.")}</p><p className="guest-status-legend">{bippoT("حالات الزبون تسجّل آخر تفاعل، ماشي ضمان أنه سمع الرنة.")}</p></div><select aria-label={bippoT("تصفية الطلبات")} value={filter} onChange={e => setFilter(e.target.value)}><option value="all">{bippoT("كل الحالات")}</option><option value="active">{bippoT("الطلبات النشطة")}</option><option value="preparing">{bippoT("راه يتحضّر")}</option><option value="ready">{bippoT("واجد للاستلام")}</option><option value="collected">{bippoT("تسلّم الطلب")}</option></select></div>{error && <p className="error" role="alert">{bippoT("تعذر التحديث: ")}{error}{bippoT(" — نعاودو الاتصال تلقائيًا.")}</p>}{!orders ? <p>{bippoT("نحمّلو الطلبات…")}</p> : visible.map(o => <div className={'order-row ' + o.status} key={o.id}><div className="order-number"><DotNumber value={o.number} /></div><div className="order-detail"><span className={'status ' + o.status}>{statuses[o.status]}</span><small>{new Date(o.created_at).toLocaleString(bippoLocale, {
                   day: '2-digit',
                   month: '2-digit',
                   hour: '2-digit',

@@ -2,11 +2,7 @@ import { t as bippoT } from "./i18n.js";
 import { cloud, db } from './store';
 export { expired, operating } from './adminDomain';
 const KEY = 'bippo-admin-demo-v1';
-export const shopTypes = {
-  cafe: bippoT("مقهى"),
-  restaurant: bippoT("مطعم"),
-  other: bippoT("نشاط آخر")
-};
+export { shopTypes } from './shopActivities';
 export const subStates = {
   trial: bippoT("تجريبي"),
   active: bippoT("نشط"),

@@ -2,6 +2,7 @@ import { t } from './i18n.js';
 
 export const serviceSolutions = {
   'laundries': {
+    kind: 'laundry',
     tag: t("مغاسل الملابس"),
     title: t("خلّي الزبون يعرف كي يوجدو حوايجو."),
     intro: t("للغسيل والكي في نفس النهار. عطِ للزبون تيكي متابعة وهو يسلّم حوايجو."),
@@ -10,6 +11,7 @@ export const serviceSolutions = {
     pickup: t("الحوايج راهي واجدة للاستلام.")
   },
   'car-washes': {
+    kind: 'car_wash',
     tag: t("مغاسل السيارات"),
     title: t("السيارة راهي تغسل. الزبون يتبع من تليفونو."),
     intro: t("الزبون يقدر يقعد بعيد على مكان الغسيل ويرجع كي تكمل سيارتو."),
@@ -18,6 +20,7 @@ export const serviceSolutions = {
     pickup: t("السيارة راهي واجدة للاستلام.")
   },
   'tailors': {
+    kind: 'tailor',
     tag: t("الخياطون"),
     title: t("التعديل كمل؟ خبّر الزبون باش يجي يديه."),
     intro: t("للتعديلات السريعة في نفس النهار، كيما تقصير السروال وتبديل السحّاب."),
