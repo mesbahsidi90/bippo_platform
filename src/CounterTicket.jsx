@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import Brand from './Brand';
@@ -7,7 +7,19 @@ import { counterRoute, counterTicket, normalizeTrackingCode } from './counterAcc
 import './counter-ticket.css';
 
 export function CounterPoster({ shop }) {
+  const preview = useRef(null);
   const url = ticketLink(counterRoute(shop.shop_id));
+  function downloadCode() {
+    const svg = preview.current?.querySelector('svg');
+    if (!svg) return;
+    const file = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+    const fileUrl = URL.createObjectURL(file);
+    const anchor = document.createElement('a');
+    anchor.href = fileUrl;
+    anchor.download = 'bippo-counter-qr.svg';
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(fileUrl), 1000);
+  }
   const poster = (
     <article className="counter-poster">
       <h3>{shop.name}</h3>
@@ -19,10 +31,11 @@ export function CounterPoster({ shop }) {
   );
   return (
     <section className="counter-settings">
-      {poster}
+      <div ref={preview}>{poster}</div>
       <button type="button" className="button outline" onClick={() => window.print()}>
         {t('طباعة ملصق الكونتوار')}
       </button>
+      <button type="button" className="button outline" onClick={downloadCode}>{t('تحميل QR بصيغة SVG')}</button>
       {createPortal(<div className="receipt-print-root counter-print">{poster}</div>, document.body)}
     </section>
   );

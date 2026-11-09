@@ -11,7 +11,7 @@ import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
 import Brand from './Brand';
 import { supportWhatsApp } from './contactDetails';
-import { CounterPoster } from './CounterTicket';
+import MerchantCodes from './MerchantCodes';
 import './merchant-workspace.css';
 import { retryPush } from './OrderAlerts';
 import { staffSignals } from './guestApi';
@@ -186,24 +186,8 @@ export default function Orders({
         </header>
         {tab === 'reports' && <Reports />}
         {(tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
-        {tab === 'codes' && (
-          <section className="panel merchant-codes">
-            {shopError && <p role="alert" className="error">{shopError}</p>}
-            {!shop && !shopError && <p>{bippoT('نحمّلو الإعدادات…')}</p>}
-            {shop && (
-              <>
-                <h2>{shop.tracking_mode === 'counter' ? bippoT('QR ثابت عند الكونتوار') : bippoT('QR لكل طلب (افتراضي)')}</h2>
-                {shop.tracking_mode === 'counter' ? <CounterPoster shop={shop} /> : (
-                  <p>{bippoT('افتح رمز المتابعة من بطاقة الطلب، أو أنشئ طلبًا جديدًا.')}</p>
-                )}
-                <button className="button outline" onClick={() => setTab(shop.tracking_mode === 'counter' ? 'settings' : 'orders')}>
-                  {shop.tracking_mode === 'counter' ? bippoT('الإعدادات') : tabs[0][1]}
-                </button>
-                {shop.tracking_mode !== 'counter' && <button className="button outline" onClick={() => setTab('settings')}>{bippoT('طريقة متابعة الطلب')}</button>}
-              </>
-            )}
-          </section>
-        )}
+        {tab === 'codes' && <MerchantCodes shop={shop} error={shopError}
+          onOrders={() => setTab('orders')} onSettings={() => setTab('settings')} />}
         {tab === 'orders' && (
           <>
             <details className="panel merchant-setup" open={orders?.length === 0 || undefined}>

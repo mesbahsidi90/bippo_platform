@@ -928,5 +928,12 @@
   "حضّر طريقة مشاركة الرمز": "Configurez le partage du QR",
   "خصّص صفحة الزبون": "Personnalisez la page client",
   "جرّب أول تيكي": "Essayez votre premier ticket",
-  "ادخل بالبريد الإلكتروني وكلمة المرور تاع حسابك.": "Connectez-vous avec l’adresse e-mail et le mot de passe de votre compte."
+  "ادخل بالبريد الإلكتروني وكلمة المرور تاع حسابك.": "Connectez-vous avec l’adresse e-mail et le mot de passe de votre compte.",
+  "شاشة الانتظار": "Écran d’attente",
+  "تعذر تحميل رابط شاشة الانتظار.": "Impossible de charger le lien de l’écran d’attente.",
+  "افتح الرابط في متصفح التلفزيون أو التابلت لعرض أرقام الطلبات.": "Ouvrez ce lien dans le navigateur du téléviseur ou de la tablette pour afficher les numéros.",
+  "رابط شاشة الانتظار": "Lien de l’écran d’attente",
+  "افتح الشاشة": "Ouvrir l’écran",
+  "انسخ الرابط من الحقل.": "Copiez le lien depuis le champ.",
+  "تحميل QR بصيغة SVG": "Télécharger le QR au format SVG"
 }
