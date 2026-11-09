@@ -2,9 +2,9 @@ import { t as bippoT } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
 import Brand from './Brand';
 import { cloud, db } from './store';
-export default function Signup() {
+export default function Signup({ initialKind = 'cafe' }) {
   const [shop, setShop] = useState(''),
-    [kind, setKind] = useState('cafe'),
+    [kind, setKind] = useState(initialKind),
     [city, setCity] = useState(''),
     [email, setEmail] = useState(''),
     [password, setPassword] = useState(''),

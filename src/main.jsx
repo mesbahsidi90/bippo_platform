@@ -50,7 +50,7 @@ function App() {
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
   }, []);
-  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
+  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={token === 'other' ? 'other' : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
 }
 function useLive(loader, deps = []) {
   const [data, setData] = useState(null),

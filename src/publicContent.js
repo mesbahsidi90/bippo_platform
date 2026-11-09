@@ -1,6 +1,8 @@
 import { t as bippoT } from "./i18n.js";
-export const publicRoutes = ['bipeur', 'guide', 'cafes', 'restaurants', 'contact', 'privacy', 'terms'];
+import { serviceSolutions } from './serviceSolutions';
+export const publicRoutes = ['bipeur', 'guide', 'cafes', 'restaurants', 'contact', 'privacy', 'terms', ...Object.keys(serviceSolutions)];
 export const pageInfo = {
+  ...serviceSolutions,
   bipeur: {
     title: bippoT("bippo ولا جهاز نداء الزبائن (Bipeur)؟"),
     tag: bippoT("قارن حلول النداء"),
