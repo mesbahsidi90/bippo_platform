@@ -40,7 +40,7 @@ Deno.serve(async req=>{
  if(!uuid.test(body.order_id||''))return reply({error:'Invalid order'},400);
  const internal=req.headers.get('x-bippo-webhook')===cfg.webhook_secret;
  const order=check(await db.from('orders').select('id,number,status,token,shop_id,created_at').eq('id',body.order_id).maybeSingle());if(!order)return reply({error:'Order not found'},404);
- if(!internal){const bearer=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'');if(!bearer)return reply({error:'Authentication required'},401);const {data,error}=await db.auth.getUser(bearer);if(error||!data.user)return reply({error:'Authentication required'},401);const member=check(await db.from('memberships').select('shop_id').eq('user_id',data.user.id).maybeSingle());if(member?.shop_id!==order.shop_id)return reply({error:'Not authorized'},403);}
+ if(!internal){const bearer=req.headers.get('authorization')?.replace(/^Bearer\s+/i,'');if(!bearer)return reply({error:'Authentication required'},401);const {data,error}=await db.auth.getUser(bearer);if(error||!data.user)return reply({error:'Authentication required'},401);const allowed=check(await db.rpc('merchant_order_access',{actor:data.user.id,target:order.shop_id}));if(!allowed)return reply({error:'Not authorized'},403);}
  return reply(await send(order,cfg));
  }
  return reply({error:'Not found'},404);

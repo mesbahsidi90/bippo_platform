@@ -26,6 +26,8 @@ import './signup-links.css';
 import './merchant-login.css';
 import LanguageSwitcher from './LanguageSwitcher';
 import Receipt from './Receipt';
+import AcceptInvite from './AcceptInvite';
+import { rememberBranch } from './merchantBranches';
 import { shopActivity, shopTypes } from './shopActivities';
 import CounterTicket from './CounterTicket';
 import { trackingCode } from './counterAccess.js';
@@ -52,7 +54,7 @@ function App() {
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
   }, []);
-  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={Object.hasOwn(shopTypes, token) ? token : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard key={token} workspace={token} /> : <Landing />;
+  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'invite' ? <AcceptInvite key={token} token={token} /> : page === 'signup' ? <Signup key={token} initialKind={Object.hasOwn(shopTypes, token) ? token : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard key={token} workspace={token} /> : <Landing />;
 }
 function useLive(loader, deps = []) {
   const [data, setData] = useState(null),
@@ -119,6 +121,7 @@ function Login() {
     setBusy(true);
     setError('');
     try {
+      rememberBranch(null);
       const result = await db.auth.signInWithPassword({ email: email.trim(), password });
       if (result.error) throw result.error;
     } catch {

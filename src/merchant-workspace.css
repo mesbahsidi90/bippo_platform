@@ -103,6 +103,17 @@
 .merchant-plan { display: grid; gap: 8px; margin-block: 16px; }
 .merchant-plan > div { display: flex; justify-content: space-between; gap: 12px; padding-block: 8px; border-bottom: 1px solid #dce8e1; }
 .merchant-plan dd { margin: 0; font-weight: 700; }
+.merchant-branch-picker { display: grid; gap: 4px; margin: 0 8px 12px; }
+.merchant-branch-picker select { min-width: 0; }
+.merchant-team form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.merchant-team form label { flex: 1 1 160px; }
+.merchant-team ul { margin: 16px 0 0; padding: 0; list-style: none; }
+.merchant-team li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 9px; padding: 10px 0; border-top: 1px solid #dce8e1; }
+.merchant-team li small { display: block; }
+.merchant-invite { margin-block: 12px; padding: 12px; border-radius: 12px; background: #eef7f2; }
+.merchant-invite input { width: 100%; margin-block: 8px; }
+.merchant-themes span { text-align: center; }
+.merchant-themes i { display: block; border-radius: 8px; padding: 5px 12px; margin-block-end: 4px; font-style: normal; font-weight: 700; }
 .merchant-setup { margin-block-end: 15px; }
 .merchant-setup summary { font-weight: 750; cursor: pointer; }
 .merchant-setup ol { padding: 0; margin: 10px 0 0; list-style: none; }

@@ -1,11 +1,12 @@
 import { t as bippoT } from "./i18n.js";
 import { createClient } from '@supabase/supabase-js';
 import { normalizeNumber, validTransition, active } from './domain';
+import { branchFetch } from './merchantBranches';
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const cloud = Boolean(url && key);
 export const authLinkError = new URLSearchParams(location.hash.slice(1)).get('error_description');
-export const db = cloud ? createClient(url, key) : null;
+export const db = cloud ? createClient(url, key, { global: { fetch: branchFetch(url) } }) : null;
 const STORAGE = 'nawba-demo-v1';
 const seed = [101, 102, 103].map((number, i) => ({
   id: crypto.randomUUID(),

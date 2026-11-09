@@ -2,9 +2,11 @@ import { t as bippoT } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
 import { LogOut, Save, ImagePlus, Bell } from 'lucide-react';
 import { cloud, db } from './store';
-import { getSettings, saveSettings, readLogo } from './shopSettings';
+import { getSettings, saveSettings, readLogo, readBanner } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import CustomerPager from './CustomerPager';
+import { rememberBranch } from './merchantBranches';
+import { customerThemes } from './customerThemes';
 import './shop-settings.css';
 export default function ShopSettings({ customer = false, onSaved }) {
   const [form, setForm] = useState(null),
@@ -64,6 +66,37 @@ export default function ShopSettings({ customer = false, onSaved }) {
      ? bippoT('بعد الحفظ، اطبع الملصق مرة وحدة. مع كل طلب، سلّم للزبون كود المتابعة.')
      : bippoT('الزبون يمسح QR من تيكي الطلب ويفتح طلبه مباشرة.')}</p>
  </section>}
+ {customer && <>
+   <fieldset className="merchant-kind merchant-themes">
+     <legend>{bippoT('القوالب')}</legend>
+     {Object.entries(customerThemes).map(([key, theme]) => (
+       <label key={key}>
+         <input type="radio" name="customer-theme" checked={form.customer_theme === key}
+           onChange={() => update('customer_theme', key)} disabled={busy} />
+         <span><i style={{ background: theme.ticket, color: theme.digits }}>57</i>{bippoT(theme.label)}</span>
+       </label>
+     ))}
+   </fieldset>
+   <section className="shop-review-section">
+     <h3>{bippoT('بانر المحل')}</h3>
+     <label>{bippoT('نص البانر')}<input maxLength={160} value={form.banner_text}
+       onChange={e => update('banner_text', e.target.value)} /></label>
+     <label>{bippoT('صورة البانر')}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy}
+       onChange={async e => {
+         const file = e.target.files?.[0];
+         e.target.value = '';
+         if (!file) return;
+         setBusy(true);
+         setError('');
+         try { update('banner_image', await readBanner(file)); }
+         catch (error) { setError(error.message); }
+         finally { setBusy(false); }
+       }} /></label>
+     {form.banner_image && <button className="button outline small" type="button" onClick={() => update('banner_image', '')}>
+       {bippoT('نحّي صورة البانر')}
+     </button>}
+   </section>
+ </>}
  {customer && <div className="shop-logo-editor">{form.logo ? <img src={form.logo} alt={bippoT("شعار المحل")} /> : <span className="shop-logo-placeholder"><ImagePlus /></span>}<div><label>{bippoT("شعار المحل")}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={async e => {
               const file = e.target.files?.[0];
               if (!file) return;
@@ -89,6 +122,7 @@ export default function ShopSettings({ customer = false, onSaved }) {
               error
             } = await db.auth.signOut();
             if (error) throw error;
+            rememberBranch(null);
           } else location.hash = '';
         } catch (e) {
           setError(e.message);

@@ -1,6 +1,7 @@
 import { t as bippoT } from "./i18n.js";
 import { cloud, db } from './store';
 import { shopActivity } from './shopActivities';
+import { themeKey } from './customerThemes';
 import { reviewUrl } from './guestExperience';
 const key = 'bippo-shop-settings';
 export const defaults = {
@@ -11,7 +12,10 @@ export const defaults = {
   logo: '',
   google_review_url: '',
   kind: 'cafe',
-  tracking_mode: 'order'
+  tracking_mode: 'order',
+  customer_theme: 'classic',
+  banner_text: '',
+  banner_image: ''
 };
 export async function getSettings() {
   if (!cloud) return {
@@ -42,6 +46,9 @@ export async function saveSettings(value) {
     address: value.address.trim(),
     pickup_message: value.pickup_message.trim(),
     logo: value.logo,
+    customer_theme: themeKey(value.customer_theme),
+    banner_text: (value.banner_text || '').trim(),
+    banner_image: value.banner_image || '',
     google_review_url: reviewUrl(value.google_review_url || ''),
     tracking_mode: value.tracking_mode === 'counter' ? 'counter' : 'order'
   };
@@ -67,28 +74,29 @@ export async function saveSettings(value) {
 }
 export async function ticketBranding(ticket) {
   if (!cloud) return getSettings();
-  const {
-    data,
-    error
-  } = await db.rpc('ticket_branding', {
-    ticket
-  });
-  if (error) throw error;
-  return data?.[0] || defaults;
+  const [branding, design] = await Promise.all([
+    db.rpc('ticket_branding', { ticket }),
+    db.rpc('ticket_design', { ticket })
+  ]);
+  if (branding.error) throw branding.error;
+  return { ...defaults, ...branding.data?.[0], ...(!design.error && design.data) };
 }
-export async function readLogo(file) {
+async function readImage(file, dimension, maxLength) {
   if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) throw new Error(bippoT("اختار PNG أو JPG أو WebP، أقل من 2 ميغا."));
   const bitmap = await createImageBitmap(file);
   try {
     const canvas = document.createElement('canvas');
-    const scale = Math.min(1, 320 / Math.max(bitmap.width, bitmap.height));
+    const scale = Math.min(1, dimension / Math.max(bitmap.width, bitmap.height));
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));
     canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     const result = canvas.toDataURL('image/webp', .85);
-    if (result.length > 150000) throw new Error(bippoT("الشعار كبير، جرّب صورة أبسط."));
+    if (result.length > maxLength) throw new Error(bippoT("الشعار كبير، جرّب صورة أبسط."));
     return result;
   } finally {
     bitmap.close();
   }
 }
+
+export const readLogo = file => readImage(file, 320, 150000);
+export const readBanner = file => readImage(file, 720, 180000);

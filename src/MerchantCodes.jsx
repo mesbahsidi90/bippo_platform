@@ -62,9 +62,9 @@ export default function MerchantCodes({ shop, error, onOrders, onSettings, foodS
           <p>{t('افتح رمز المتابعة من بطاقة الطلب، أو أنشئ طلبًا جديدًا.')}</p>
           <button type="button" className="button small" onClick={onOrders}>{t('مساحة العمل')}</button>
         </>}
-        <button type="button" className="button outline small" onClick={onSettings}>
+        {onSettings && <button type="button" className="button outline small" onClick={onSettings}>
           <Settings size={16} />{t('طريقة متابعة الطلب')}
-        </button>
+        </button>}
       </article>
       <WaitingScreen key={shop.shop_id} shopId={shop.shop_id} />
       {foodService && <article className="panel merchant-code-card">

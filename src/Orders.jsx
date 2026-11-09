@@ -1,7 +1,7 @@
 import { t as bippoT, locale as bippoLocale } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle, ChefHat, Sparkles, CreditCard } from 'lucide-react';
-import { cloud, listOrders, createOrder, transition, subscribe } from './store';
+import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle, ChefHat, Sparkles, CreditCard, Store, Users, LogOut } from 'lucide-react';
+import { cloud, db, listOrders, createOrder, transition, subscribe } from './store';
 import { statuses } from './domain';
 import DotNumber from './DotNumber';
 import Reports from './Reports';
@@ -13,6 +13,8 @@ import Brand from './Brand';
 import { supportWhatsApp } from './contactDetails';
 import MerchantCodes from './MerchantCodes';
 import MerchantSubscription from './MerchantSubscription';
+import MerchantTeam, { BranchSelector, workspaceAction } from './MerchantTeam';
+import { rememberBranch } from './merchantBranches';
 import './merchant-workspace.css';
 import { retryPush } from './OrderAlerts';
 import { staffSignals } from './guestApi';
@@ -31,7 +33,19 @@ export default function Orders({
     [pushFailed, setPushFailed] = useState(null),
     [signalsUnavailable, setSignalsUnavailable] = useState(false),
     [shop, setShop] = useState(null),
-    [shopError, setShopError] = useState('');
+    [shopError, setShopError] = useState(''),
+    [workspaceData, setWorkspaceData] = useState(null),
+    [workspaceError, setWorkspaceError] = useState('');
+
+  async function refreshWorkspace() {
+    if (!cloud) return;
+    try {
+      setWorkspaceData(await workspaceAction('list'));
+      setWorkspaceError('');
+    } catch { setWorkspaceError(bippoT('تعذر تحميل الفروع والفريق.')); }
+  }
+
+  useEffect(() => { void refreshWorkspace(); }, []);
   const activity = shopActivity(shop?.kind);
   useEffect(() => {
     let alive = true;
@@ -114,12 +128,17 @@ export default function Orders({
     ['orders', activity.foodService ? bippoT('الطلبات') : bippoT('التيكيات'), List],
     ['reports', bippoT('السجل والتقارير'), BarChart3],
     ['codes', bippoT('الأكواد'), QrCode],
-    ['customer', bippoT('صفحة الزبون'), Palette],
+    ...(workspaceData?.manager ? [
+      ['branches', bippoT('الفروع'), Store],
+      ['team', bippoT('الفريق'), Users]
+    ] : []),
+    ...(!workspaceData?.staff ? [['customer', bippoT('صفحة الزبون'), Palette],
     ['settings', bippoT('الإعدادات'), Settings],
-    ['billing', bippoT('الاشتراك'), CreditCard]
+    ['billing', bippoT('الاشتراك'), CreditCard]] : [])
   ];
   const kitchen = tab === 'kitchen' && Boolean(shop && activity.foodService);
   const activeTab = tabs.find(([id]) => id === tab);
+  const managerActions = !cloud || (workspaceData && !workspaceData.staff);
   const numberLabel = activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي');
 
   async function addOrder(event) {
@@ -172,6 +191,7 @@ export default function Orders({
           {shop?.logo && <img src={shop.logo} alt="" />}
           <div><strong>{shop?.name || bippoT('محلي')}</strong><small>{activity.label}</small></div>
         </div>
+        <BranchSelector workspace={workspaceData} />
         <nav aria-label={bippoT('مساحة العمل')}>
           {tabs.map(([id, label, Icon]) => (
             <button key={id} type="button" aria-current={tab === id ? 'page' : undefined} onClick={() => setTab(id)}>
@@ -179,6 +199,13 @@ export default function Orders({
             </button>
           ))}
         </nav>
+        {workspaceData?.staff && <button type="button" className="button outline small" onClick={async () => {
+          try {
+            const result = await db.auth.signOut();
+            if (result.error) throw result.error;
+            rememberBranch(null);
+          } catch { setWorkspaceError(bippoT('تعذر حفظ التغيير. عاود المحاولة.')); }
+        }}><LogOut size={17} />{bippoT(' تسجيل الخروج')}</button>}
         <a className="merchant-support" href={supportWhatsApp} target="_blank" rel="noopener noreferrer">
           <MessageCircle size={18} />{bippoT('تواصل معنا')}
         </a>
@@ -189,19 +216,22 @@ export default function Orders({
           <h1>{activeTab?.[1] || bippoT('شاشة المطبخ')}</h1>
           {tab === 'orders' && <p>{cloud ? bippoT('آخر 200 طلب · السجل الكامل والإحصاءات في التقارير') : bippoT('وضع تجريبي · البيانات في هذا المتصفح فقط')}</p>}
         </header>
+        {workspaceError && <p role="alert" className="error">{workspaceError}</p>}
+        {tab === 'branches' && <MerchantTeam workspace={workspaceData} refresh={refreshWorkspace} branchesOnly />}
+        {tab === 'team' && <MerchantTeam workspace={workspaceData} refresh={refreshWorkspace} />}
         {tab === 'reports' && <Reports />}
-        {tab === 'billing' && <MerchantSubscription shopId={shop?.shop_id} shopError={shopError} />}
+        {tab === 'billing' && managerActions && <MerchantSubscription shopId={workspaceData?.home || shop?.shop_id} shopError={shopError} />}
         {tab === 'assistant' && <section className="panel merchant-setup">
           <h2>{bippoT('جهّز محلك')}</h2>
           <ol>
             {[
               ['codes', bippoT('حضّر طريقة مشاركة الرمز')],
-              ['customer', bippoT('خصّص صفحة الزبون')],
+              ...(managerActions ? [['customer', bippoT('خصّص صفحة الزبون')]] : []),
               ['orders', bippoT('جرّب أول تيكي')],
               ['reports', bippoT('السجل والتقارير')]
             ].map(([id, label]) => (
               <li key={id}><span>{label}</span>
-                <button type="button" className="button outline small" onClick={() => setTab(id)}>{tabs.find(([key]) => key === id)[1]}</button>
+                <button type="button" className="button outline small" onClick={() => setTab(id)}>{tabs.find(([key]) => key === id)?.[1]}</button>
               </li>
             ))}
           </ol>
@@ -231,16 +261,16 @@ export default function Orders({
             </div>}
           </>
         )}
-        {(tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
+        {managerActions && (tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
         {tab === 'codes' && <MerchantCodes shop={shop} error={shopError}
-          onOrders={() => setTab('orders')} onSettings={() => setTab('settings')} foodService={activity.foodService} />}
+          onOrders={() => setTab('orders')} onSettings={managerActions ? () => setTab('settings') : undefined} foodService={activity.foodService} />}
         {tab === 'orders' && (
           <>
             <details className="panel merchant-setup" open={orders?.length === 0 || undefined}>
               <summary>{bippoT('جهّز محلك')}</summary>
               <ol>
                 <li><span>{bippoT('حضّر طريقة مشاركة الرمز')}</span><button type="button" className="button outline small" onClick={() => setTab('codes')}>{bippoT('الأكواد')}</button></li>
-                <li><span>{bippoT('خصّص صفحة الزبون')}</span><button type="button" className="button outline small" onClick={() => setTab('customer')}>{bippoT('صفحة الزبون')}</button></li>
+                {managerActions && <li><span>{bippoT('خصّص صفحة الزبون')}</span><button type="button" className="button outline small" onClick={() => setTab('customer')}>{bippoT('صفحة الزبون')}</button></li>}
                 <li><span>{bippoT('جرّب أول تيكي')}</span><button type="button" className="button outline small" onClick={() => document.getElementById('merchant-ticket-number')?.focus()}>{numberLabel}</button></li>
               </ol>
             </details>
