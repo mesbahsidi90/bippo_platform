@@ -1,7 +1,7 @@
 import { t as bippoT, locale as bippoLocale } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, Clock, Check, CheckCheck, ChefHat, ScanLine, BarChart3, List, History } from 'lucide-react';
-import { cloud, db, listOrders, createOrder, transition, subscribe } from './store';
+import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode } from 'lucide-react';
+import { cloud, listOrders, createOrder, transition, subscribe } from './store';
 import { statuses } from './domain';
 import DotNumber from './DotNumber';
 import Reports from './Reports';
@@ -9,6 +9,9 @@ import ShopSettings from './ShopSettings.jsx';
 import { getSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
+import Brand from './Brand';
+import { CounterPoster } from './CounterTicket';
+import './merchant-workspace.css';
 import { retryPush } from './OrderAlerts';
 import { staffSignals } from './guestApi';
 import GuestStatus from './GuestStatus';
@@ -22,11 +25,12 @@ export default function Orders({
     [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false),
     [selected, setSelected] = useState(null),
-    [filter, setFilter] = useState('all'),
     [tab, setTab] = useState('orders'),
     [pushFailed, setPushFailed] = useState(null),
     [signalsUnavailable, setSignalsUnavailable] = useState(false),
-    [activity, setActivity] = useState(() => shopActivity('cafe'));
+    [shop, setShop] = useState(null),
+    [shopError, setShopError] = useState('');
+  const activity = shopActivity(shop?.kind);
   useEffect(() => {
     let alive = true;
     async function load() {
@@ -51,9 +55,6 @@ export default function Orders({
         if (alive) setError(e.message);
       }
     }
-    getSettings().then(shop => {
-      if (alive) setActivity(shopActivity(shop.kind));
-    }).catch(() => {});
     load();
     const stop = subscribe(load);
     return () => {
@@ -61,6 +62,17 @@ export default function Orders({
       stop();
     };
   }, []);
+  useEffect(() => {
+    let alive = true;
+    setShopError('');
+    getSettings().then(value => {
+      if (alive) setShop(value);
+    }).catch(e => {
+      if (alive) setShopError(e.message);
+    });
+    return () => { alive = false; };
+  }, [tab]);
+
   async function mark(o, status) {
     setBusy(true);
     try {
@@ -84,28 +96,146 @@ export default function Orders({
       setBusy(false);
     }
   }
-  const rows = orders || [],
-    visible = rows.filter(o => filter === 'all' || (filter === 'active' ? o.status !== 'collected' : o.status === filter));
-  return <main className="wrap dashboard"><div className="dashboard-title"><div><span className="eyebrow">{bippoT("مساحة العمل")}</span><h1>{(activity.foodService ? bippoT('إدارة الطلبات ') : bippoT('إدارة التيكيات '))}<span className="live"><span className="dot" />{bippoT(" مباشر")}</span></h1><p>{cloud ? bippoT("آخر 200 طلب · السجل الكامل والإحصاءات في التقارير") : bippoT("وضع تجريبي · البيانات في هذا المتصفح فقط")}</p></div></div><div className="dashboard-tabs"><button className={tab === 'orders' ? 'selected' : ''} onClick={() => setTab('orders')}><List size={17} />{bippoT(" الطلبات")}</button><button className={tab === 'reports' ? 'selected' : ''} onClick={() => setTab('reports')}><BarChart3 size={17} />{bippoT(" السجل والتقارير")}</button><button className={tab === 'settings' ? 'selected' : ''} onClick={() => setTab('settings')}><Settings size={17} />{bippoT(" الإعدادات")}</button></div>{tab === 'settings' ? <ShopSettings /> : tab === 'reports' ? <Reports /> : <><div className="stats">{[[bippoT("راه يتحضّر"), rows.filter(o => o.status === 'preparing').length, Clock], [bippoT("واجد للاستلام"), rows.filter(o => o.status === 'ready').length, Check], [bippoT("تسلّم وبقى في السجل"), rows.filter(o => o.status === 'collected').length, CheckCheck]].map(([label, n, Icon]) => <div className="stat" key={label}><Icon size={22} /><span>{label}</span><strong>{n}</strong></div>)}</div><div className="work-grid"><section className="panel new-order"><span className="round-icon"><Plus /></span><h2>{(activity.foodService ? bippoT('طلب جديد') : bippoT('تيكي جديد'))}</h2><p>{bippoT("دخل النمرة اللي راهي في تيكي الزبون.")}</p><form onSubmit={async e => {
-            e.preventDefault();
-            setBusy(true);
-            setNotice('');
-            try {
-              const o = await createOrder(number);
-              setSelected(o);
-              setNumber('');
-              setNotice(bippoT("تزاد الطلب ") + o.number);
-            } catch (e) {
-              setNotice(e.message);
-            } finally {
-              setBusy(false);
-            }
-          }}><label>{(activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي'))}<input placeholder={bippoT("مثلًا 104")} inputMode="numeric" maxLength={4} value={number} onChange={e => setNumber(e.target.value)} required /></label><button className="button full" disabled={busy}><Plus size={18} />{(activity.foodService ? bippoT(' زيد الطلب') : bippoT(' زيد التيكي'))}</button></form><small>{bippoT("ما نحتاجوش اسم الزبون ولا نمرة تليفونو.")}</small></section><section className="panel order-list"><div className="list-heading"><div><h2>{(activity.foodService ? bippoT('أحدث الطلبات') : bippoT('أحدث التيكيات'))}</h2><p className="history-hint">{bippoT("المستلمة تبقى ظاهرة ومحفوظة.")}</p><p className="guest-status-legend">{bippoT("حالات الزبون تسجّل آخر تفاعل، ماشي ضمان أنه سمع الرنة.")}</p></div><select aria-label={bippoT("تصفية الطلبات")} value={filter} onChange={e => setFilter(e.target.value)}><option value="all">{bippoT("كل الحالات")}</option><option value="active">{bippoT("الطلبات النشطة")}</option><option value="preparing">{bippoT("راه يتحضّر")}</option><option value="ready">{bippoT("واجد للاستلام")}</option><option value="collected">{bippoT("تسلّم الطلب")}</option></select></div>{error && <p className="error" role="alert">{bippoT("تعذر التحديث: ")}{error}{bippoT(" — نعاودو الاتصال تلقائيًا.")}</p>}{!orders ? <p>{bippoT("نحمّلو الطلبات…")}</p> : visible.map(o => <div className={'order-row ' + o.status} key={o.id}><div className="order-number"><DotNumber value={o.number} /></div><div className="order-detail"><span className={'status ' + o.status}>{statuses[o.status]}</span><small>{new Date(o.created_at).toLocaleString(bippoLocale, {
-                  day: '2-digit',
-                  month: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}</small>{o.ready_at && <small className="prep-duration">{bippoT("التحضير: ")}{duration(secondsBetween(o.created_at, o.ready_at))}</small>}<GuestStatus order={o} unavailable={signalsUnavailable} /></div><button className="icon-button" aria-label={bippoT("رابط الطلب ") + o.number} onClick={() => setSelected(o)}><ScanLine size={20} /></button>{o.status !== 'collected' ? <button className={'button small ' + (o.status === 'ready' ? 'outline' : '')} disabled={busy} onClick={() => mark(o, o.status === 'preparing' ? 'ready' : 'collected')}>{o.status === 'preparing' ? bippoT("جاهز") : bippoT("تسلّم الطلب")}<Check size={15} /></button> : <CheckCheck size={20} className="muted" />}</div>)}{orders && !visible.length && <div className="empty"><ChefHat size={40} /><h3>{bippoT("ما كاش طلبات بهاذ الحالة")}</h3><p>{bippoT("الطلبات المستلمة تلقاها باختيار «كل الحالات» أو في السجل.")}</p></div>}{cloud && rows.length >= 200 && <p className="history-limit"><History size={14} />{bippoT(" عرض أحدث 200 طلب. باقي الطلبات متاحة في «السجل والتقارير».")}</p>}</section></div></>}<p role="status" className="notice">{notice}</p>{pushFailed && rows.find(o => o.id === pushFailed.id)?.status === 'ready' && <button disabled={busy} className="retry-alert" onClick={async () => {
+  const rows = orders || [];
+  const groups = {
+    preparing: rows.filter(order => order.status === 'preparing'),
+    ready: rows.filter(order => order.status === 'ready'),
+    collected: rows.filter(order => order.status === 'collected')
+  };
+  const prepTimes = rows.map(order => secondsBetween(order.created_at, order.ready_at))
+    .filter(value => value != null);
+  const average = prepTimes.length
+    ? duration(prepTimes.reduce((total, value) => total + value, 0) / prepTimes.length)
+    : '—';
+  const tabs = [
+    ['orders', activity.foodService ? bippoT('الطلبات') : bippoT('التيكيات'), List],
+    ['reports', bippoT('السجل والتقارير'), BarChart3],
+    ['codes', bippoT('الأكواد'), QrCode],
+    ['settings', bippoT('الإعدادات'), Settings]
+  ];
+  const numberLabel = activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي');
+
+  async function addOrder(event) {
+    event.preventDefault();
+    setBusy(true);
+    setNotice('');
+    try {
+      const order = await createOrder(number);
+      setSelected(order);
+      setNumber('');
+      setNotice(bippoT('تزاد الطلب ') + order.number);
+    } catch (e) {
+      setNotice(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function orderCard(order) {
+    return (
+      <article className="merchant-order" key={order.id}>
+        <div className="merchant-order-info">
+          <DotNumber value={order.number} />
+          <div>
+            <time dateTime={order.created_at}>{new Date(order.created_at).toLocaleString(bippoLocale, {
+              day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+            })}</time>
+            <GuestStatus order={order} unavailable={signalsUnavailable} />
+          </div>
+        </div>
+        <div className="merchant-order-actions">
+          <button type="button" className="icon-button" aria-label={bippoT('رابط الطلب ') + order.number}
+            onClick={() => setSelected(order)}><ScanLine size={19} /></button>
+          {order.status === 'collected' ? <CheckCheck size={20} /> : (
+            <button className={'button small' + (order.status === 'ready' ? ' outline' : '')}
+              disabled={busy} onClick={() => mark(order, order.status === 'preparing' ? 'ready' : 'collected')}>
+              {order.status === 'preparing' ? bippoT('جاهز') : bippoT('تسلّم الطلب')}<Check size={15} />
+            </button>
+          )}
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <div className="merchant-workspace">
+      <aside className="merchant-sidebar">
+        <Brand linked={false} />
+        <div className="merchant-identity">
+          {shop?.logo && <img src={shop.logo} alt="" />}
+          <div><strong>{shop?.name || bippoT('محلي')}</strong><small>{activity.label}</small></div>
+        </div>
+        <nav aria-label={bippoT('مساحة العمل')}>
+          {tabs.map(([id, label, Icon]) => (
+            <button key={id} type="button" aria-current={tab === id ? 'page' : undefined} onClick={() => setTab(id)}>
+              <Icon size={18} /><span>{label}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+      <main className="merchant-main">
+        <header className="merchant-heading">
+          <span className="eyebrow">{bippoT('مساحة العمل')}</span>
+          <h1>{tabs.find(([id]) => id === tab)[1]}</h1>
+          {tab === 'orders' && <p>{cloud ? bippoT('آخر 200 طلب · السجل الكامل والإحصاءات في التقارير') : bippoT('وضع تجريبي · البيانات في هذا المتصفح فقط')}</p>}
+        </header>
+        {tab === 'reports' && <Reports />}
+        {tab === 'settings' && <ShopSettings />}
+        {tab === 'codes' && (
+          <section className="panel merchant-codes">
+            {shopError && <p role="alert" className="error">{shopError}</p>}
+            {!shop && !shopError && <p>{bippoT('نحمّلو الإعدادات…')}</p>}
+            {shop && (
+              <>
+                <h2>{shop.tracking_mode === 'counter' ? bippoT('QR ثابت عند الكونتوار') : bippoT('QR لكل طلب (افتراضي)')}</h2>
+                {shop.tracking_mode === 'counter' ? <CounterPoster shop={shop} /> : (
+                  <p>{bippoT('افتح رمز المتابعة من بطاقة الطلب، أو أنشئ طلبًا جديدًا.')}</p>
+                )}
+                <button className="button outline" onClick={() => setTab(shop.tracking_mode === 'counter' ? 'settings' : 'orders')}>
+                  {shop.tracking_mode === 'counter' ? bippoT('الإعدادات') : tabs[0][1]}
+                </button>
+                {shop.tracking_mode !== 'counter' && <button className="button outline" onClick={() => setTab('settings')}>{bippoT('طريقة متابعة الطلب')}</button>}
+              </>
+            )}
+          </section>
+        )}
+        {tab === 'orders' && (
+          <>
+            <div className="merchant-metrics">
+              {[
+                [bippoT('راه يتحضّر'), groups.preparing.length, Clock],
+                [bippoT('واجد للاستلام'), groups.ready.length, Check],
+                [bippoT('تسلّم وبقى في السجل'), groups.collected.length, CheckCheck],
+                [bippoT('متوسط التحضير'), average, BarChart3]
+              ].map(([label, value, Icon]) => (
+                <article key={label}><Icon size={17} /><span>{label}</span><strong>{orders ? value : '—'}</strong></article>
+              ))}
+            </div>
+            <form className="merchant-entry panel" onSubmit={addOrder}>
+              <label>{numberLabel}<input placeholder={bippoT('مثلًا 104')} inputMode="numeric"
+                maxLength={4} value={number} onChange={e => setNumber(e.target.value)} required /></label>
+              <button className="button" disabled={busy}><Plus size={18} />{activity.foodService ? bippoT(' زيد الطلب') : bippoT(' زيد التيكي')}</button>
+            </form>
+            {error && <p className="error" role="alert">{bippoT('تعذر التحديث: ')}{error}</p>}
+            {!orders ? <p>{bippoT('نحمّلو الطلبات…')}</p> : (
+              <>
+                <div className="merchant-board">
+                  {['preparing', 'ready'].map(status => (
+                    <section key={status} className={'merchant-lane ' + status}>
+                      <header><h2>{statuses[status]}</h2><span>{groups[status].length}</span></header>
+                      {groups[status].length ? groups[status].map(orderCard) : <p>{bippoT('ما كاش طلبات بهاذ الحالة')}</p>}
+                    </section>
+                  ))}
+                </div>
+                <details className="panel merchant-history">
+                  <summary>{bippoT('تسلّم وبقى في السجل')} · {groups.collected.length}</summary>
+                  {groups.collected.map(orderCard)}
+                </details>
+              </>
+            )}
+          </>
+        )}
+        <p role="status" className="notice">{notice}</p>{pushFailed && rows.find(o => o.id === pushFailed.id)?.status === 'ready' && <button disabled={busy} className="retry-alert" onClick={async () => {
       setBusy(true);
       try {
         const r = await retryPush(pushFailed.id);
@@ -116,5 +246,9 @@ export default function Orders({
       } finally {
         setBusy(false);
       }
-    }}>{bippoT("عاود إرسال إشعار الطلب ")}{pushFailed.number}</button>}{selected && <Share order={selected} close={() => setSelected(null)} />}</main>;
+    }}>{bippoT("عاود إرسال إشعار الطلب ")}{pushFailed.number}</button>}
+        {selected && <Share order={selected} close={() => setSelected(null)} />}
+      </main>
+    </div>
+  );
 }

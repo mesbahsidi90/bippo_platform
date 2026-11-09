@@ -103,7 +103,7 @@ function Dashboard() {
     });
     return () => data.subscription.unsubscribe();
   }, []);
-  return <><header className="nav wrap"><Brand linked={false} />{authReady && !session && cloud && <a className="button outline small" href="#signup">{bippoT("إنشاء حساب")}</a>}</header>{!authReady ? <p className="wrap">{bippoT("جارٍ الاتصال…")}</p> : cloud && !session ? <Login /> : <Orders Share={Share} />}</>;
+  return <>{cloud && !session && <header className="nav wrap"><Brand linked={false} />{authReady && <a className="button outline small" href="#signup">{bippoT("إنشاء حساب")}</a>}</header>}{!authReady ? <p className="wrap">{bippoT("جارٍ الاتصال…")}</p> : cloud && !session ? <Login /> : <Orders Share={Share} />}</>;
 }
 function Login() {
   const [email, setEmail] = useState(''),
