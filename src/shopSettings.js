@@ -1,7 +1,7 @@
 import { t as bippoT } from "./i18n.js";
 import { cloud, db } from './store';
 import { shopActivity } from './shopActivities';
-import { themeKey } from './customerThemes';
+import { cleanCustomerOptions, themeKey } from './customerThemes';
 import { reviewUrl } from './guestExperience';
 const key = 'bippo-shop-settings';
 export const defaults = {
@@ -15,7 +15,9 @@ export const defaults = {
   tracking_mode: 'order',
   customer_theme: 'classic',
   banner_text: '',
-  banner_image: ''
+  banner_image: '',
+  customer_options: {},
+  customer_background_image: ''
 };
 export async function getSettings() {
   if (!cloud) return {
@@ -49,6 +51,8 @@ export async function saveSettings(value) {
     customer_theme: themeKey(value.customer_theme),
     banner_text: (value.banner_text || '').trim(),
     banner_image: value.banner_image || '',
+    customer_options: cleanCustomerOptions(value.customer_options),
+    customer_background_image: value.customer_background_image || '',
     google_review_url: reviewUrl(value.google_review_url || ''),
     tracking_mode: value.tracking_mode === 'counter' ? 'counter' : 'order'
   };

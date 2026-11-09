@@ -6,6 +6,7 @@ import { statuses } from './domain';
 import DotNumber from './DotNumber';
 import Reports from './Reports';
 import ShopSettings from './ShopSettings.jsx';
+import CustomerDesigner from './CustomerDesigner';
 import { getSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
@@ -261,7 +262,8 @@ export default function Orders({
             </div>}
           </>
         )}
-        {managerActions && (tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
+        {managerActions && tab === 'settings' && <ShopSettings onSaved={setShop} />}
+        {managerActions && tab === 'customer' && <CustomerDesigner onSaved={setShop} />}
         {tab === 'codes' && <MerchantCodes shop={shop} error={shopError}
           onOrders={() => setTab('orders')} onSettings={managerActions ? () => setTab('settings') : undefined} foodService={activity.foodService} />}
         {tab === 'orders' && (

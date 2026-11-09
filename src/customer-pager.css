@@ -8,3 +8,17 @@
 .pager-banner { width: min(100%, 440px); margin-block-start: 16px; overflow: hidden; border-radius: 18px; background: #fff; }
 .pager-banner img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
 .pager-banner p { padding: 12px 16px; margin: 0; overflow-wrap: anywhere; }
+.pager-page:not(.pager-calling) { color: var(--customer-paper-ink, #151a19); background-image: var(--customer-image, none); background-size: cover; background-position: center; }
+.pager-page:not(.pager-calling) .pager-shop { padding: 8px; border-radius: 16px; background: var(--customer-paper, #fafbf6); }
+.pager-page:not(.pager-calling) .pager-shop span:not(.pager-shop-logo) { color: inherit; }
+.pager-page:not(.pager-calling) .pager-ticket { color: var(--customer-ink, #fff); }
+.pager-page:not(.pager-calling) .pager-status-copy p { color: inherit; opacity: .85; }
+.pager-page .pager-shop-logo { background: var(--customer-brand, #102e29); }
+.pager-page .pager-shop-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.pager-page .pager-shop-logo:has(img) { display: block; overflow: hidden; }
+.pager-offer { border: 2px solid var(--customer-brand, #102e29); padding: 10px; }
+.pager-offer strong { display: block; padding: 4px 8px; }
+.pager-offer a, .pager-offer > span { display: inline-block; margin: 4px 8px; text-decoration: underline; }
+.pager-banner { color: #152d27; }
+.pager-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; width: min(100%, 440px); margin-block-start: 14px; }
+.pager-links > * { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border: 1px solid #d9e3dc; border-radius: 99px; background: #fff; color: #163a32; }
