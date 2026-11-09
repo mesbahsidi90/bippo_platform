@@ -1011,5 +1011,21 @@
   "صورة": "Image",
   "عرض": "Offre",
   "رابط العرض": "Lien de l’offre",
-  "شوف العرض": "Voir l’offre"
+  "شوف العرض": "Voir l’offre",
+  "الفروع والأكواد": "Établissements et codes QR",
+  "رابط الشاشة": "Lien de l’écran",
+  "تعذر نسخ الرابط.": "Impossible de copier le lien.",
+  "تبدّل رابط شاشة الانتظار؟ الرابط القديم يتوقف.": "Renouveler le lien de l’écran d’attente ? L’ancien lien sera désactivé.",
+  "تعذر تغيير رابط شاشة الانتظار.": "Impossible de renouveler le lien de l’écran d’attente.",
+  "تغيير الرابط": "Renouveler le lien",
+  "كيفاش يمسح الزبون الكود؟": "Comment le client scanne-t-il le code ?",
+  "اختار الطريقة المناسبة للفرع.": "Choisissez la méthode adaptée à cet établissement.",
+  "الكود المطبوع": "Code imprimé",
+  "شاشة الزبون (تابلت)": "Écran client (tablette)",
+  "امسح هذا الرمز بالتابلت باش تفتح شاشة مشاركة الأكواد.": "Scannez ce code avec la tablette pour ouvrir l’écran de partage.",
+  "شاشات إضافية (اختياري)": "Écrans supplémentaires (facultatif)",
+  "إعدادات الفرع": "Paramètres de l’établissement",
+  "فرع جديد": "Nouvel établissement",
+  "شغّال": "Actif",
+  "اختار طلب باش تعرض الكود": "Choisissez une commande pour afficher son code"
 }

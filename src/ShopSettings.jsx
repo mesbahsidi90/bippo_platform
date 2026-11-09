@@ -6,7 +6,7 @@ import { getSettings, saveSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { rememberBranch } from './merchantBranches';
 import './shop-settings.css';
-export default function ShopSettings({ onSaved }) {
+export default function ShopSettings({ onSaved, branchOnly = false }) {
   const [form, setForm] = useState(null),
     [error, setError] = useState(''),
     [message, setMessage] = useState(''),
@@ -18,13 +18,13 @@ export default function ShopSettings({ onSaved }) {
       if (!alive) return;
       setForm(value);
     }).catch(e => alive && setError(e.message));
-    db?.auth.getUser().then(({
+    if (!branchOnly) db?.auth.getUser().then(({
       data
     }) => alive && setEmail(data.user?.email || ''));
     return () => {
       alive = false;
     };
-  }, []);
+  }, [branchOnly]);
   const update = (field, value) => {
     setForm(v => ({
       ...v,
@@ -64,7 +64,7 @@ export default function ShopSettings({ onSaved }) {
  </section>
  <div className="shop-settings-grid"><label>{bippoT("اسم المحل")}<input required maxLength={100} value={form.name} onChange={e => update('name', e.target.value)} /></label><label>{bippoT("المدينة")}<input maxLength={100} value={form.city} onChange={e => update('city', e.target.value)} /></label></div>
  <label>{bippoT("عنوان المحل")}<input maxLength={200} value={form.address} onChange={e => update('address', e.target.value)} /></label><button className="button" disabled={busy}><Save size={18} /> {busy ? bippoT("نحفظو…") : bippoT("حفظ الإعدادات")}</button>{message && <p role="status" className="notice">{message}</p>}
- </form>}<div className="shop-account"><h3>{bippoT("الحساب")}</h3>{email && <p dir="ltr">{email}</p>}{cloud && <a className="button outline" href="#account">{bippoT("تغيير كلمة المرور")}</a>}<button className="button logout-button" disabled={busy} onClick={async () => {
+ </form>}{!branchOnly && <div className="shop-account"><h3>{bippoT("الحساب")}</h3>{email && <p dir="ltr">{email}</p>}{cloud && <a className="button outline" href="#account">{bippoT("تغيير كلمة المرور")}</a>}<button className="button logout-button" disabled={busy} onClick={async () => {
         setBusy(true);
         setError('');
         try {
@@ -80,5 +80,5 @@ export default function ShopSettings({ onSaved }) {
         } finally {
           setBusy(false);
         }
-      }}><LogOut size={18} />{bippoT(" تسجيل الخروج")}</button></div></section>;
+      }}><LogOut size={18} />{bippoT(" تسجيل الخروج")}</button></div>}</section>;
 }

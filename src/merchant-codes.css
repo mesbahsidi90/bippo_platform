@@ -1,0 +1,40 @@
+.merchant-branches-codes { display: grid; gap: 12px; }
+.branch-add { display: grid; justify-items: start; gap: 10px; }
+.branch-add form { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; }
+.branch-block { border: 1px solid #e2e4dc; border-radius: 20px; background: #fff; overflow: hidden; }
+.branch-block > summary, .branch-switch, .branch-settings > summary {
+  display: flex; width: 100%; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 15px 18px; cursor: pointer; list-style: none;
+  text-align: start; color: inherit; font: inherit;
+}
+.branch-block > summary::-webkit-details-marker, .branch-settings > summary::-webkit-details-marker { display: none; }
+.branch-switch { border: 0; background: #fff; }
+.branch-block[open] > summary { border-bottom: 1px solid #e2e4dc; }
+.branch-block[open] > summary > svg, .branch-settings[open] > summary > svg { transform: rotate(180deg); }
+.branch-status { margin-inline-start: 8px; padding: 2px 7px; border-radius: 20px; background: #f1ede6; }
+.branch-status.active { color: #13633d; background: #e8f6ed; }
+.branch-caption { display: block; color: #4f625b; }
+.branch-tools { padding: 18px; display: grid; gap: 12px; }
+.branch-tools h2 { font-size: 1rem; margin: 0; }
+.branch-tools p { color: #50645b; font-size: .88rem; margin: 4px 0 9px; }
+.branch-code-card, .branch-settings {
+  background: #f7f7f3; border: 1px solid #e4e6df; border-radius: 15px;
+}
+.branch-code-card { padding: 13px; min-width: 0; }
+.branch-code-card h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 7px; font-size: .98rem; }
+.branch-code-card h3 svg { color: #10423a; }
+.branch-code-card input { width: 100%; margin-block: 4px 8px; }
+.branch-code-card .button { margin-block: 3px; }
+.branch-code-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.branch-screen-qr { display: grid; place-items: center; padding: 6px; margin: 7px auto; border-radius: 12px; background: #fff; width: fit-content; }
+.branch-code-card .counter-settings { display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.branch-code-card .counter-settings > div:not(.counter-print) { flex-basis: 100%; }
+.branch-code-card .counter-settings .counter-poster { padding: 8px; width: min(100%, 190px); }
+.branch-code-card .counter-settings .counter-poster svg { width: 126px; }
+.branch-code-card .counter-settings .counter-poster .brand { display: none; }
+.branch-settings > .shop-settings { margin: 0 10px 10px; }
+.branch-tablet { min-height: 100svh; display: grid; justify-items: center; align-content: start; gap: 12px; padding: 25px 14px; text-align: center; }
+.branch-tablet label { display: grid; gap: 5px; width: min(100%, 320px); }
+.branch-tablet-qr { padding: 12px; background: #fff; border: 1px solid #e2e4dc; border-radius: 16px; max-width: 100%; }
+.branch-tablet-qr svg { width: min(280px, 75vw); height: auto; }
+@media (max-width: 750px) { .branch-tools { padding: 12px; } }

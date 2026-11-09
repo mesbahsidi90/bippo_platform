@@ -15,7 +15,11 @@ export function BranchSelector({ workspace }) {
     {t('الفرع الحالي')}
     <select value={workspace.active || ''} onChange={event => {
       rememberBranch(event.target.value);
-      location.reload();
+      const url = new URL(location.href);
+      if (url.searchParams.has('branch')) {
+        url.searchParams.delete('branch');
+        location.replace(url.href);
+      } else location.reload();
     }}>
       {!workspace.active && <option value="" disabled>{t('اختار الفرع')}</option>}
       {workspace.branches.map(branch => <option key={branch.id} value={branch.id}>{branch.name}</option>)}

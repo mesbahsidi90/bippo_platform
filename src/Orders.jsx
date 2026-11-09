@@ -1,6 +1,6 @@
-import { t as bippoT, locale as bippoLocale } from "./i18n.js";
+import { t as bippoT, locale as bippoLocale, ticketLink } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle, ChefHat, Sparkles, CreditCard, Store, Users, LogOut } from 'lucide-react';
+import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle, ChefHat, Sparkles, CreditCard, Users, LogOut } from 'lucide-react';
 import { cloud, db, listOrders, createOrder, transition, subscribe } from './store';
 import { statuses } from './domain';
 import DotNumber from './DotNumber';
@@ -11,6 +11,8 @@ import { getSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
 import Brand from './Brand';
+import { QRCodeSVG } from 'qrcode.react';
+import { counterRoute } from './counterAccess';
 import { supportWhatsApp } from './contactDetails';
 import MerchantCodes from './MerchantCodes';
 import MerchantSubscription from './MerchantSubscription';
@@ -30,7 +32,8 @@ export default function Orders({
     [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false),
     [selected, setSelected] = useState(null),
-    [tab, setTab] = useState(workspace === 'kitchen' ? 'kitchen' : 'orders'),
+    [tab, setTab] = useState(['kitchen', 'codes', 'customer-screen'].includes(workspace) ? workspace : 'orders'),
+    [screenOrderId, setScreenOrderId] = useState(''),
     [pushFailed, setPushFailed] = useState(null),
     [signalsUnavailable, setSignalsUnavailable] = useState(false),
     [shop, setShop] = useState(null),
@@ -128,9 +131,8 @@ export default function Orders({
     ['assistant', bippoT('دليل التجهيز'), Sparkles],
     ['orders', activity.foodService ? bippoT('الطلبات') : bippoT('التيكيات'), List],
     ['reports', bippoT('السجل والتقارير'), BarChart3],
-    ['codes', bippoT('الأكواد'), QrCode],
+    ['codes', bippoT('الفروع والأكواد'), QrCode],
     ...(workspaceData?.manager ? [
-      ['branches', bippoT('الفروع'), Store],
       ['team', bippoT('الفريق'), Users]
     ] : []),
     ...(!workspaceData?.staff ? [['customer', bippoT('صفحة الزبون'), Palette],
@@ -184,6 +186,31 @@ export default function Orders({
     );
   }
 
+  if (tab === 'customer-screen') {
+    const activeOrders = rows.filter(order => order.status !== 'collected');
+    const selectedOrder = activeOrders.find(order => order.id === screenOrderId);
+    const fixed = shop?.tracking_mode === 'counter';
+    const url = fixed ? ticketLink(counterRoute(shop.shop_id)) : selectedOrder ? ticketLink('track/' + selectedOrder.token) : null;
+    return <main className="branch-tablet">
+      <Brand linked={false} />
+      <h1>{bippoT('شاشة الزبون (تابلت)')}</h1>
+      {shop?.name && <p>{shop.name}</p>}
+      {(shopError || error) && <p role="alert" className="error">{shopError || error}</p>}
+      {shop && !fixed && <label>{numberLabel}
+        <select value={selectedOrder?.id || ''} onChange={event => setScreenOrderId(event.target.value)}>
+          <option value="">{bippoT('اختار طلب باش تعرض الكود')}</option>
+          {activeOrders.map(order => <option key={order.id} value={order.id}>{order.number}</option>)}
+        </select>
+      </label>}
+      {url && <div className="branch-tablet-qr">
+        <QRCodeSVG value={url} size={280} marginSize={4} />
+        <p>{fixed ? bippoT('دخل كود المتابعة اللي عطاهولك الكاشير وفعّل التنبيه.') : bippoT('امسح الرمز وتابع طلبك')}</p>
+        {selectedOrder && <strong dir="ltr">{selectedOrder.number}</strong>}
+      </div>}
+      <a className="button outline" href={ticketLink('dashboard/codes')}>{bippoT('الفروع والأكواد')}</a>
+    </main>;
+  }
+
   return (
     <div className="merchant-workspace">
       <aside className="merchant-sidebar">
@@ -218,7 +245,6 @@ export default function Orders({
           {tab === 'orders' && <p>{cloud ? bippoT('آخر 200 طلب · السجل الكامل والإحصاءات في التقارير') : bippoT('وضع تجريبي · البيانات في هذا المتصفح فقط')}</p>}
         </header>
         {workspaceError && <p role="alert" className="error">{workspaceError}</p>}
-        {tab === 'branches' && <MerchantTeam workspace={workspaceData} refresh={refreshWorkspace} branchesOnly />}
         {tab === 'team' && <MerchantTeam workspace={workspaceData} refresh={refreshWorkspace} />}
         {tab === 'reports' && <Reports />}
         {tab === 'billing' && managerActions && <MerchantSubscription shopId={workspaceData?.home || shop?.shop_id} shopError={shopError} />}
@@ -264,14 +290,14 @@ export default function Orders({
         )}
         {managerActions && tab === 'settings' && <ShopSettings onSaved={setShop} />}
         {managerActions && tab === 'customer' && <CustomerDesigner onSaved={setShop} />}
-        {tab === 'codes' && <MerchantCodes shop={shop} error={shopError}
-          onOrders={() => setTab('orders')} onSettings={managerActions ? () => setTab('settings') : undefined} foodService={activity.foodService} />}
+        {tab === 'codes' && <MerchantCodes shop={shop} error={shopError} workspace={workspaceData} refresh={refreshWorkspace}
+          onOrders={() => setTab('orders')} onSaved={setShop} canManage={managerActions} foodService={activity.foodService} />}
         {tab === 'orders' && (
           <>
             <details className="panel merchant-setup" open={orders?.length === 0 || undefined}>
               <summary>{bippoT('جهّز محلك')}</summary>
               <ol>
-                <li><span>{bippoT('حضّر طريقة مشاركة الرمز')}</span><button type="button" className="button outline small" onClick={() => setTab('codes')}>{bippoT('الأكواد')}</button></li>
+                <li><span>{bippoT('حضّر طريقة مشاركة الرمز')}</span><button type="button" className="button outline small" onClick={() => setTab('codes')}>{bippoT('الفروع والأكواد')}</button></li>
                 {managerActions && <li><span>{bippoT('خصّص صفحة الزبون')}</span><button type="button" className="button outline small" onClick={() => setTab('customer')}>{bippoT('صفحة الزبون')}</button></li>}
                 <li><span>{bippoT('جرّب أول تيكي')}</span><button type="button" className="button outline small" onClick={() => document.getElementById('merchant-ticket-number')?.focus()}>{numberLabel}</button></li>
               </ol>
