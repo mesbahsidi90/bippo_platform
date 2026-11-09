@@ -51,8 +51,16 @@
 .merchant-main .button { border-radius: 99px; }
 .merchant-support {
   display: flex; align-items: center; gap: 9px;
-  padding: 10px; margin-block-start: auto; border: 1px solid #e1e5de; border-radius: 14px;
+  padding: 10px; border: 1px solid #e1e5de; border-radius: 14px;
 }
+.merchant-sidebar-footer { display: grid; gap: 8px; margin-block-start: auto; padding-block-start: 16px; }
+.merchant-support small { display: block; text-align: end; color: #4b665e; }
+.merchant-signout {
+  display: flex; align-items: center; gap: 9px; padding: 10px;
+  border: 0; border-radius: 10px; background: transparent;
+  color: inherit; font: inherit; font-weight: 600; text-align: start; cursor: pointer;
+}
+.merchant-signout:hover { background: #edf5f0; }
 .merchant-heading { margin-bottom: 20px; }
 .merchant-heading h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.3; }
 .merchant-heading p, .merchant-lane > p { color: #4b665e; }
@@ -158,4 +166,3 @@
 @media (max-width: 360px) {
   .merchant-entry { display: grid; }
 }
-

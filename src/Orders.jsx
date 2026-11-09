@@ -13,7 +13,7 @@ import { duration, secondsBetween } from './reporting';
 import Brand from './Brand';
 import { QRCodeSVG } from 'qrcode.react';
 import { counterRoute } from './counterAccess';
-import { supportWhatsApp } from './contactDetails';
+import { supportPhone, supportWhatsApp } from './contactDetails';
 import MerchantCodes from './MerchantCodes';
 import MerchantSubscription from './MerchantSubscription';
 import MerchantTeam, { BranchSelector, workspaceAction } from './MerchantTeam';
@@ -227,16 +227,22 @@ export default function Orders({
             </button>
           ))}
         </nav>
-        {workspaceData?.staff && <button type="button" className="button outline small" onClick={async () => {
-          try {
-            const result = await db.auth.signOut();
-            if (result.error) throw result.error;
-            rememberBranch(null);
-          } catch { setWorkspaceError(bippoT('تعذر حفظ التغيير. عاود المحاولة.')); }
-        }}><LogOut size={17} />{bippoT(' تسجيل الخروج')}</button>}
-        <a className="merchant-support" href={supportWhatsApp} target="_blank" rel="noopener noreferrer">
-          <MessageCircle size={18} />{bippoT('تواصل معنا')}
-        </a>
+        <div className="merchant-sidebar-footer">
+          <a className="merchant-support" href={supportWhatsApp} target="_blank" rel="noopener noreferrer">
+            <MessageCircle size={18} />
+            <span>{bippoT('تواصل معنا')}<small dir="ltr">{supportPhone}</small></span>
+          </a>
+          <button type="button" className="merchant-signout" onClick={async () => {
+            try {
+              if (cloud) {
+                const { error } = await db.auth.signOut();
+                if (error) throw error;
+              }
+              rememberBranch(null);
+              if (!cloud) location.hash = '';
+            } catch { setWorkspaceError(bippoT('تعذر حفظ التغيير. عاود المحاولة.')); }
+          }}><LogOut size={17} />{bippoT(' تسجيل الخروج')}</button>
+        </div>
       </aside>
       <main className="merchant-main">
         <header className="merchant-heading">
