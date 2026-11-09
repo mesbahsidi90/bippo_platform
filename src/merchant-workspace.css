@@ -17,6 +17,7 @@
   border-inline-end: 1px solid #dce8e1;
 }
 .merchant-sidebar > .brand { margin-inline: 9px; }
+.merchant-sidebar > .brand > b { display: none; }
 .merchant-identity {
   display: flex;
   align-items: center;
@@ -42,9 +43,10 @@
   text-align: start;
   cursor: pointer;
 }
+.merchant-sidebar nav button { font-weight: 600; }
 .merchant-sidebar nav button:hover { background: #edf5f0; }
 .merchant-sidebar nav button[aria-current] { color: #fff; background: #10423a; }
-.merchant-main { width: min(100%, 932px); margin-inline: auto; padding: 28px 24px 80px; }
+.merchant-main { width: min(100%, 1010px); margin-inline: auto; padding: 28px 24px 80px; }
 .merchant-main .panel { box-shadow: none; border-color: #e1e5de; }
 .merchant-main .button { border-radius: 99px; }
 .merchant-support {
@@ -156,3 +158,4 @@
 @media (max-width: 360px) {
   .merchant-entry { display: grid; }
 }
+
