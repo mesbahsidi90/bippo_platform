@@ -922,5 +922,10 @@
   "تيكي متابعة الخدمة": "Ticket de suivi du service",
   "التيكيات": "Tickets",
   "الأكواد": "Codes QR",
-  "افتح رمز المتابعة من بطاقة الطلب، أو أنشئ طلبًا جديدًا.": "Ouvrez le QR de suivi sur la carte de la commande ou créez une commande."
+  "افتح رمز المتابعة من بطاقة الطلب، أو أنشئ طلبًا جديدًا.": "Ouvrez le QR de suivi sur la carte de la commande ou créez une commande.",
+  "هوية صفحة الزبون": "Identité de la page client",
+  "جهّز محلك": "Configurez votre établissement",
+  "حضّر طريقة مشاركة الرمز": "Configurez le partage du QR",
+  "خصّص صفحة الزبون": "Personnalisez la page client",
+  "جرّب أول تيكي": "Essayez votre premier ticket"
 }

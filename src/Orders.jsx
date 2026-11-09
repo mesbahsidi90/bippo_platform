@@ -1,6 +1,6 @@
 import { t as bippoT, locale as bippoLocale } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode } from 'lucide-react';
+import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle } from 'lucide-react';
 import { cloud, listOrders, createOrder, transition, subscribe } from './store';
 import { statuses } from './domain';
 import DotNumber from './DotNumber';
@@ -10,6 +10,7 @@ import { getSettings } from './shopSettings';
 import { shopActivity } from './shopActivities';
 import { duration, secondsBetween } from './reporting';
 import Brand from './Brand';
+import { supportWhatsApp } from './contactDetails';
 import { CounterPoster } from './CounterTicket';
 import './merchant-workspace.css';
 import { retryPush } from './OrderAlerts';
@@ -111,6 +112,7 @@ export default function Orders({
     ['orders', activity.foodService ? bippoT('الطلبات') : bippoT('التيكيات'), List],
     ['reports', bippoT('السجل والتقارير'), BarChart3],
     ['codes', bippoT('الأكواد'), QrCode],
+    ['customer', bippoT('صفحة الزبون'), Palette],
     ['settings', bippoT('الإعدادات'), Settings]
   ];
   const numberLabel = activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي');
@@ -172,15 +174,18 @@ export default function Orders({
             </button>
           ))}
         </nav>
+        <a className="merchant-support" href={supportWhatsApp} target="_blank" rel="noopener noreferrer">
+          <MessageCircle size={18} />{bippoT('تواصل معنا')}
+        </a>
       </aside>
       <main className="merchant-main">
         <header className="merchant-heading">
-          <span className="eyebrow">{bippoT('مساحة العمل')}</span>
+          
           <h1>{tabs.find(([id]) => id === tab)[1]}</h1>
           {tab === 'orders' && <p>{cloud ? bippoT('آخر 200 طلب · السجل الكامل والإحصاءات في التقارير') : bippoT('وضع تجريبي · البيانات في هذا المتصفح فقط')}</p>}
         </header>
         {tab === 'reports' && <Reports />}
-        {tab === 'settings' && <ShopSettings />}
+        {(tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
         {tab === 'codes' && (
           <section className="panel merchant-codes">
             {shopError && <p role="alert" className="error">{shopError}</p>}
@@ -201,6 +206,14 @@ export default function Orders({
         )}
         {tab === 'orders' && (
           <>
+            <details className="panel merchant-setup" open={orders?.length === 0 || undefined}>
+              <summary>{bippoT('جهّز محلك')}</summary>
+              <ol>
+                <li><span>{bippoT('حضّر طريقة مشاركة الرمز')}</span><button type="button" className="button outline small" onClick={() => setTab('codes')}>{bippoT('الأكواد')}</button></li>
+                <li><span>{bippoT('خصّص صفحة الزبون')}</span><button type="button" className="button outline small" onClick={() => setTab('customer')}>{bippoT('صفحة الزبون')}</button></li>
+                <li><span>{bippoT('جرّب أول تيكي')}</span><button type="button" className="button outline small" onClick={() => document.getElementById('merchant-ticket-number')?.focus()}>{numberLabel}</button></li>
+              </ol>
+            </details>
             <div className="merchant-metrics">
               {[
                 [bippoT('راه يتحضّر'), groups.preparing.length, Clock],
@@ -212,7 +225,7 @@ export default function Orders({
               ))}
             </div>
             <form className="merchant-entry panel" onSubmit={addOrder}>
-              <label>{numberLabel}<input placeholder={bippoT('مثلًا 104')} inputMode="numeric"
+              <label>{numberLabel}<input id="merchant-ticket-number" placeholder={bippoT('مثلًا 104')} inputMode="numeric"
                 maxLength={4} value={number} onChange={e => setNumber(e.target.value)} required /></label>
               <button className="button" disabled={busy}><Plus size={18} />{activity.foodService ? bippoT(' زيد الطلب') : bippoT(' زيد التيكي')}</button>
             </form>
