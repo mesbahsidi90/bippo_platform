@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Monitor, Printer, ScanLine, Settings } from 'lucide-react';
+import { Monitor, Printer, ScanLine, Settings, ChefHat } from 'lucide-react';
 import { t, ticketLink } from './i18n.js';
 import { cloud, db } from './store';
 import { CounterPoster } from './CounterTicket';
@@ -48,7 +48,7 @@ function WaitingScreen({ shopId }) {
   );
 }
 
-export default function MerchantCodes({ shop, error, onOrders, onSettings }) {
+export default function MerchantCodes({ shop, error, onOrders, onSettings, foodService }) {
   if (error) return <p role="alert" className="error">{error}</p>;
   if (!shop) return <p role="status">{t('نحمّلو الإعدادات…')}</p>;
   const fixed = shop.tracking_mode === 'counter';
@@ -67,6 +67,12 @@ export default function MerchantCodes({ shop, error, onOrders, onSettings }) {
         </button>
       </article>
       <WaitingScreen key={shop.shop_id} shopId={shop.shop_id} />
+      {foodService && <article className="panel merchant-code-card">
+        <ChefHat size={21} />
+        <h2>{t('شاشة المطبخ')}</h2>
+        <p>{t('من التابلت في المطبخ، علّم الطلب جاهز باش يتحدّث عند الزبون.')}</p>
+        <a className="button small" href={ticketLink('dashboard/kitchen')} target="_blank" rel="noreferrer">{t('افتح الشاشة')}</a>
+      </article>}
     </div>
   );
 }

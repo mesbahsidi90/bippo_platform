@@ -1,6 +1,6 @@
 import { t as bippoT, locale as bippoLocale } from "./i18n.js";
 import React, { useState, useEffect } from 'react';
-import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle } from 'lucide-react';
+import { Plus, Settings, Clock, Check, CheckCheck, ScanLine, BarChart3, List, QrCode, Palette, MessageCircle, ChefHat, Sparkles, CreditCard } from 'lucide-react';
 import { cloud, listOrders, createOrder, transition, subscribe } from './store';
 import { statuses } from './domain';
 import DotNumber from './DotNumber';
@@ -12,13 +12,14 @@ import { duration, secondsBetween } from './reporting';
 import Brand from './Brand';
 import { supportWhatsApp } from './contactDetails';
 import MerchantCodes from './MerchantCodes';
+import MerchantSubscription from './MerchantSubscription';
 import './merchant-workspace.css';
 import { retryPush } from './OrderAlerts';
 import { staffSignals } from './guestApi';
 import GuestStatus from './GuestStatus';
 import './guest-experience.css';
 export default function Orders({
-  Share
+  Share, workspace
 }) {
   const [orders, setOrders] = useState(null),
     [error, setError] = useState(''),
@@ -26,7 +27,7 @@ export default function Orders({
     [notice, setNotice] = useState(''),
     [busy, setBusy] = useState(false),
     [selected, setSelected] = useState(null),
-    [tab, setTab] = useState('orders'),
+    [tab, setTab] = useState(workspace === 'kitchen' ? 'kitchen' : 'orders'),
     [pushFailed, setPushFailed] = useState(null),
     [signalsUnavailable, setSignalsUnavailable] = useState(false),
     [shop, setShop] = useState(null),
@@ -109,12 +110,16 @@ export default function Orders({
     ? duration(prepTimes.reduce((total, value) => total + value, 0) / prepTimes.length)
     : '—';
   const tabs = [
+    ['assistant', bippoT('دليل التجهيز'), Sparkles],
     ['orders', activity.foodService ? bippoT('الطلبات') : bippoT('التيكيات'), List],
     ['reports', bippoT('السجل والتقارير'), BarChart3],
     ['codes', bippoT('الأكواد'), QrCode],
     ['customer', bippoT('صفحة الزبون'), Palette],
-    ['settings', bippoT('الإعدادات'), Settings]
+    ['settings', bippoT('الإعدادات'), Settings],
+    ['billing', bippoT('الاشتراك'), CreditCard]
   ];
+  const kitchen = tab === 'kitchen' && Boolean(shop && activity.foodService);
+  const activeTab = tabs.find(([id]) => id === tab);
   const numberLabel = activity.foodService ? bippoT('رقم الطلب') : bippoT('رقم التيكي');
 
   async function addOrder(event) {
@@ -181,13 +186,54 @@ export default function Orders({
       <main className="merchant-main">
         <header className="merchant-heading">
           
-          <h1>{tabs.find(([id]) => id === tab)[1]}</h1>
+          <h1>{activeTab?.[1] || bippoT('شاشة المطبخ')}</h1>
           {tab === 'orders' && <p>{cloud ? bippoT('آخر 200 طلب · السجل الكامل والإحصاءات في التقارير') : bippoT('وضع تجريبي · البيانات في هذا المتصفح فقط')}</p>}
         </header>
         {tab === 'reports' && <Reports />}
+        {tab === 'billing' && <MerchantSubscription shopId={shop?.shop_id} shopError={shopError} />}
+        {tab === 'assistant' && <section className="panel merchant-setup">
+          <h2>{bippoT('جهّز محلك')}</h2>
+          <ol>
+            {[
+              ['codes', bippoT('حضّر طريقة مشاركة الرمز')],
+              ['customer', bippoT('خصّص صفحة الزبون')],
+              ['orders', bippoT('جرّب أول تيكي')],
+              ['reports', bippoT('السجل والتقارير')]
+            ].map(([id, label]) => (
+              <li key={id}><span>{label}</span>
+                <button type="button" className="button outline small" onClick={() => setTab(id)}>{tabs.find(([key]) => key === id)[1]}</button>
+              </li>
+            ))}
+          </ol>
+        </section>}
+        {tab === 'kitchen' && (
+          <>
+            {shopError && <p role="alert" className="error">{shopError}</p>}
+            {(!shop || !orders) && !shopError && !error && <p role="status">{bippoT('نحمّلو الطلبات…')}</p>}
+            {error && <p role="alert" className="error">{error}</p>}
+            {shop && !activity.foodService && <p>{bippoT('شاشة المطبخ متاحة لأنشطة الأكل.')}</p>}
+            {kitchen && orders && <div className="merchant-board">
+              {['preparing', 'ready'].map(status => (
+                <section key={status} className={'merchant-lane ' + status}>
+                  <header><h2>{statuses[status]}</h2><span>{groups[status].length}</span></header>
+                  {groups[status].length ? groups[status].map(order => (
+                    <article className="merchant-order" key={order.id}>
+                      <div className="merchant-order-info"><DotNumber value={order.number} /></div>
+                      {status === 'preparing' ? (
+                        <button type="button" className="button" disabled={busy} onClick={() => mark(order, 'ready')}>
+                          <ChefHat size={18} />{bippoT('جاهز')}
+                        </button>
+                      ) : <Check size={22} />}
+                    </article>
+                  )) : <p>{bippoT('ما كاش طلبات بهاذ الحالة')}</p>}
+                </section>
+              ))}
+            </div>}
+          </>
+        )}
         {(tab === 'settings' || tab === 'customer') && <ShopSettings key={tab} customer={tab === 'customer'} onSaved={setShop} />}
         {tab === 'codes' && <MerchantCodes shop={shop} error={shopError}
-          onOrders={() => setTab('orders')} onSettings={() => setTab('settings')} />}
+          onOrders={() => setTab('orders')} onSettings={() => setTab('settings')} foodService={activity.foodService} />}
         {tab === 'orders' && (
           <>
             <details className="panel merchant-setup" open={orders?.length === 0 || undefined}>

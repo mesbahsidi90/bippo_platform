@@ -100,6 +100,9 @@
 .merchant-code-card h2 { margin-block: 8px; font-size: 1.15rem; }
 .merchant-code-card input { width: 100%; margin-block: 8px; }
 .merchant-code-card .button { margin-block-start: 8px; margin-inline-end: 5px; }
+.merchant-plan { display: grid; gap: 8px; margin-block: 16px; }
+.merchant-plan > div { display: flex; justify-content: space-between; gap: 12px; padding-block: 8px; border-bottom: 1px solid #dce8e1; }
+.merchant-plan dd { margin: 0; font-weight: 700; }
 .merchant-setup { margin-block-end: 15px; }
 .merchant-setup summary { font-weight: 750; cursor: pointer; }
 .merchant-setup ol { padding: 0; margin: 10px 0 0; list-style: none; }

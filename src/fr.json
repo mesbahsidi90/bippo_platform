@@ -935,5 +935,15 @@
   "رابط شاشة الانتظار": "Lien de l’écran d’attente",
   "افتح الشاشة": "Ouvrir l’écran",
   "انسخ الرابط من الحقل.": "Copiez le lien depuis le champ.",
-  "تحميل QR بصيغة SVG": "Télécharger le QR au format SVG"
+  "تحميل QR بصيغة SVG": "Télécharger le QR au format SVG",
+  "دليل التجهيز": "Guide de configuration",
+  "شاشة المطبخ": "Écran cuisine",
+  "شاشة المطبخ متاحة لأنشطة الأكل.": "L’écran cuisine est disponible pour les activités de restauration.",
+  "من التابلت في المطبخ، علّم الطلب جاهز باش يتحدّث عند الزبون.": "Depuis la tablette en cuisine, marquez la commande prête pour mettre à jour le suivi du client.",
+  "الباقة الحالية": "Offre actuelle",
+  "تاريخ نهاية الاشتراك": "Fin de l’abonnement",
+  "سعر الباقة شهريًا": "Prix mensuel de l’offre",
+  "ما كاش اشتراك مربوط بهذا المحل.": "Aucun abonnement associé à cet établissement.",
+  "تعذر تحميل الاشتراك.": "Impossible de charger l’abonnement.",
+  "تواصل معنا لتغيير الباقة": "Contactez-nous pour changer d’offre"
 }

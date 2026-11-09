@@ -52,7 +52,7 @@ function App() {
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
   }, []);
-  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={Object.hasOwn(shopTypes, token) ? token : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
+  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup key={token} initialKind={Object.hasOwn(shopTypes, token) ? token : 'cafe'} /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard key={token} workspace={token} /> : <Landing />;
 }
 function useLive(loader, deps = []) {
   const [data, setData] = useState(null),
@@ -85,7 +85,7 @@ function useLive(loader, deps = []) {
     last
   };
 }
-function Dashboard() {
+function Dashboard({ workspace }) {
   const [session, setSession] = useState(null),
     [authReady, setAuthReady] = useState(!cloud);
   useEffect(() => {
@@ -105,7 +105,7 @@ function Dashboard() {
     return () => data.subscription.unsubscribe();
   }, []);
   if (!authReady) return <main className="merchant-login"><p role="status">{bippoT('جارٍ الاتصال…')}</p></main>;
-  return cloud && !session ? <Login /> : <Orders Share={Share} />;
+  return cloud && !session ? <Login /> : <Orders Share={Share} workspace={workspace} />;
 }
 
 function Login() {
