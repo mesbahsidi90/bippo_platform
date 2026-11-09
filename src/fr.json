@@ -862,5 +862,22 @@
   "كي يوجد طلبك، اللعبة تحبس وننبّهوك.": "Dès que votre commande est prête, le jeu s’arrête et l’alerte prend le relais.",
   "أحسن نتيجة محفوظة في هذا الجهاز فقط. بلا حساب.": "Record conservé sur cet appareil uniquement. Sans compte.",
   "نستعمل التخزين المحلي وذاكرة الجلسة لحفظ جلسة الدخول، آخر رابط طلب، وتفضيلات التنبيه واللغة وأحسن نتيجة في لعبة الانتظار. في وضع المعاينة دون قاعدة بيانات، تبقى الطلبات والإعدادات التجريبية في المتصفح نفسه. مسح بيانات الموقع يزيل هذه البيانات المحلية وقد يسجل خروجك.": "Le stockage local et de session conserve la connexion, le dernier lien de commande et les préférences d’alerte. En démo sans base de données, commandes et paramètres restent dans le navigateur. Effacer les données du site les supprime et peut vous déconnecter. Votre langue et votre record au jeu d’attente sont aussi enregistrés localement.",
-  "اللعبة موقوفة. كمّل كي تحب.": "Le jeu est en pause. Reprenez quand vous voulez."
+  "اللعبة موقوفة. كمّل كي تحب.": "Le jeu est en pause. Reprenez quand vous voulez.",
+  "امسح الرمز وتابع طلبك": "Scannez le QR pour suivre votre commande",
+  "دخل كود المتابعة اللي عطاهولك الكاشير وفعّل التنبيه.": "Saisissez le code donné à la caisse, puis activez la notification.",
+  "طباعة ملصق الكونتوار": "Imprimer l’affiche du comptoir",
+  "تعذر الاتصال. عاود المحاولة.": "Connexion impossible. Réessayez.",
+  "تأكد من كود المتابعة وعاود.": "Vérifiez le code de suivi, puis réessayez.",
+  "الكود غير صالح أو فات وقت المتابعة. اسأل الكاشير.": "Ce code est invalide ou expiré. Demandez à la caisse.",
+  "متابعة الطلبات بهذا الرمز غير متاحة. اسأل الكاشير.": "Le suivi avec ce QR est indisponible. Demandez à la caisse.",
+  "كود المتابعة": "Code de suivi",
+  "عاود المحاولة": "Réessayer",
+  "طريقة متابعة الطلب": "Mode de suivi des commandes",
+  "QR لكل طلب (افتراضي)": "QR par commande (par défaut)",
+  "QR ثابت عند الكونتوار": "QR fixe au comptoir",
+  "بعد الحفظ، اطبع الملصق مرة وحدة. مع كل طلب، سلّم للزبون كود المتابعة.": "Après l’enregistrement, imprimez l’affiche une seule fois. Remettez le code de suivi au client à chaque commande.",
+  "الزبون يمسح QR من تيكي الطلب ويفتح طلبه مباشرة.": "Le client scanne le QR sur le ticket et accède directement à sa commande.",
+  "الزبون يمسح QR الثابت ويدخل هذا الكود.": "Le client scanne le QR du comptoir et saisit ce code.",
+  "امسح QR عند الكونتوار، دخل هذا الكود وفعّل التنبيه.": "Scannez le QR au comptoir, saisissez ce code et activez la notification.",
+  "كود المتابعة صالح 24 ساعة من إنشاء الطلب.": "Le code est valable 24 heures après la création de la commande."
 }

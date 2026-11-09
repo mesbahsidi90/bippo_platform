@@ -25,6 +25,8 @@ import './alerts-reports.css';
 import './signup-links.css';
 import LanguageSwitcher from './LanguageSwitcher';
 import Receipt from './Receipt';
+import CounterTicket from './CounterTicket';
+import { trackingCode } from './counterAccess.js';
 import ReviewCard from './ReviewCard';
 import { getSettings } from './shopSettings';
 import { signalGuest, guestExtras } from './guestApi';
@@ -48,7 +50,7 @@ function App() {
     addEventListener('hashchange', change);
     return () => removeEventListener('hashchange', change);
   }, []);
-  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
+  return publicRoutes.includes(page) ? <PublicPages key={page} page={page} /> : page === 'signup' ? <Signup /> : page === 'demo' ? <DemoCustomer key={token} token={token} /> : page === 'counter' ? <CounterTicket key={token} branch={token} /> : page === 'follow' ? <FollowTicket /> : page === 'reset' ? <ResetPassword /> : page === 'admin' ? <Admin /> : page === 'account' ? <Account /> : page === 'track' ? <Customer key={token} token={token} /> : page === 'display' ? <Display token={token} /> : page === 'dashboard' ? <Dashboard /> : <Landing />;
 }
 function useLive(loader, deps = []) {
   const [data, setData] = useState(null),
@@ -130,6 +132,7 @@ function Share({
     [preview, setPreview] = useState(false),
     [printError, setPrintError] = useState('');
   const url = link('track/' + order.token);
+  const code = branding?.tracking_mode === 'counter' ? trackingCode(order) : '';
   useEffect(() => {
     let live = true;
     getSettings().then(v => live && setBranding(v)).catch(() => live && setPrintError(bippoT("تعذر تحميل بيانات التيكي. أغلق النافذة وعاود.")));
@@ -142,14 +145,20 @@ function Share({
       document.removeEventListener('keydown', esc);
     };
   }, []);
-  return <div className="modal" onClick={close}><section role="dialog" aria-modal="true" aria-label={bippoT("مشاركة الطلب")} className="panel share" onClick={e => e.stopPropagation()}><button autoFocus className="close icon-button" onClick={close} aria-label={bippoT("إغلاق")}><X /></button><h2>{bippoT("طلب ")}{order.number}</h2><p>{bippoT("ليفتح الزبون الرابط أو يمسح الرمز.")}</p><QRCodeSVG value={url} size={210} level="M" marginSize={3} /><div className="receipt-controls"><label className="comparison-sr-only" htmlFor="receipt-width">{bippoT("عرض التيكي")}</label><select id="receipt-width" aria-label={bippoT("عرض التيكي")} value={width} onChange={e => setWidth(e.target.value)}><option value="80">{bippoT("80 مم")}</option><option value="58">{bippoT("58 مم")}</option></select><button className="button" disabled={!branding} onClick={() => window.print()}><Printer size={17} />{bippoT(" طباعة التيكي")}</button></div><button className="button outline full" disabled={!branding} onClick={() => setPreview(true)}>{bippoT("معاينة التيكي")}</button>{printError && <p role="alert" className="error">{printError}</p>}<small>{bippoT("اختار نفس عرض الورق في نافذة الطباعة، مقياس 100٪، بلا هوامش ولا ترويسة. تقدر تحفظه PDF.")}</small><a className="button full" href={'#track/' + order.token} target="_blank" rel="noreferrer">{bippoT("افتح صفحة الزبون ")}<ExternalLink size={17} /></a><button className="button outline full" onClick={async () => {
+  return <div className="modal" onClick={close}><section role="dialog" aria-modal="true" aria-label={bippoT("مشاركة الطلب")} className="panel share" onClick={e => e.stopPropagation()}><button autoFocus className="close icon-button" onClick={close} aria-label={bippoT("إغلاق")}><X /></button><h2>{bippoT("طلب ")}{order.number}</h2>{code ? <>
+      <p>{bippoT('الزبون يمسح QR الثابت ويدخل هذا الكود.')}</p>
+      <strong className="counter-code" dir="ltr">{code}</strong>
+    </> : <>
+      <p>{bippoT("ليفتح الزبون الرابط أو يمسح الرمز.")}</p>
+      <QRCodeSVG value={url} size={210} level="M" marginSize={3} />
+    </>}<div className="receipt-controls"><label className="comparison-sr-only" htmlFor="receipt-width">{bippoT("عرض التيكي")}</label><select id="receipt-width" aria-label={bippoT("عرض التيكي")} value={width} onChange={e => setWidth(e.target.value)}><option value="80">{bippoT("80 مم")}</option><option value="58">{bippoT("58 مم")}</option></select><button className="button" disabled={!branding} onClick={() => window.print()}><Printer size={17} />{bippoT(" طباعة التيكي")}</button></div><button className="button outline full" disabled={!branding} onClick={() => setPreview(true)}>{bippoT("معاينة التيكي")}</button>{printError && <p role="alert" className="error">{printError}</p>}<small>{bippoT("اختار نفس عرض الورق في نافذة الطباعة، مقياس 100٪، بلا هوامش ولا ترويسة. تقدر تحفظه PDF.")}</small><a className="button full" href={'#track/' + order.token} target="_blank" rel="noreferrer">{bippoT("افتح صفحة الزبون ")}<ExternalLink size={17} /></a><button className="button outline full" onClick={async () => {
         try {
           await navigator.clipboard.writeText(url);
           setCopied(true);
         } catch {
           setCopied(false);
         }
-      }}><Copy size={16} />{copied ? bippoT("نُسخ الرابط") : bippoT("نسخ الرابط")}</button><input aria-label={bippoT("رابط الطلب")} readOnly value={url} dir="ltr" onFocus={e => e.target.select()} />{!cloud && <small>{bippoT("رمز التجربة يعمل في المتصفح نفسه. للأجهزة الأخرى، فعّل Supabase.")}</small>}</section>{branding && <Receipt order={order} branding={branding} url={url} width={width} preview={preview} onClose={() => setPreview(false)} />}</div>;
+      }}><Copy size={16} />{copied ? bippoT("نُسخ الرابط") : bippoT("نسخ الرابط")}</button><input aria-label={bippoT("رابط الطلب")} readOnly value={url} dir="ltr" onFocus={e => e.target.select()} />{!cloud && <small>{bippoT("رمز التجربة يعمل في المتصفح نفسه. للأجهزة الأخرى، فعّل Supabase.")}</small>}</section>{branding && <Receipt order={order} branding={branding} url={url} code={code} width={width} preview={preview} onClose={() => setPreview(false)} />}</div>;
 }
 function Customer({
   token

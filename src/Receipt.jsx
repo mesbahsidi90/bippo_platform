@@ -8,11 +8,19 @@ export default function Receipt({
   order,
   branding,
   url,
+  code,
   width = '80',
   preview = false,
   onClose
 }) {
   return createPortal(<div className={'receipt-print-root ' + (preview ? 'receipt-screen-preview' : '')} onClick={e => e.stopPropagation()} style={{
     '--receipt-width': width + 'mm'
-  }}>{preview && <div className="receipt-preview-toolbar"><button onClick={onClose}>{bippoT("رجوع")}</button><span>{bippoT("معاينة التيكي · ")}{width}{bippoT(" مم")}</span><button onClick={() => window.print()}>{bippoT("طباعة")}</button></div>}<article className="receipt-paper" dir={bippoDirection}>{branding?.logo && <img className="receipt-logo" src={branding.logo} alt="" />}<h1>{branding?.name || bippoT("محلك")}</h1>{branding?.address && <p>{branding.address}</p>}<p>{bippoT("تيكي متابعة الطلب")}</p><strong className="receipt-number">{order.number}</strong><p>{new Date(order.created_at).toLocaleString(bippoLocale)}</p><div className="receipt-qr"><QRCodeSVG value={url} size={220} level="M" marginSize={4} /></div><h2>{bippoT("امسح الكود وفعّل التنبيه")}</h2><p>{bippoT("باش تعرف كي يوجد طلبك، بلا تحميل تطبيق.")}</p><p>{pickupText(branding?.pickup_message) || bippoT("تقدر تجي تديه من الكونتوار.")}</p><small>{bippoT("الرابط خاص بطلبك وصالح 24 ساعة من إنشائه.")}<br />{bippoT("تنبيه الهاتف حسب الاتصال والأذونات.")}</small><footer><Brand linked={false} /><span>{bippoT("تيكي متابعة، ماشي فاتورة دفع.")}</span></footer></article></div>, document.body);
+  }}>{preview && <div className="receipt-preview-toolbar"><button onClick={onClose}>{bippoT("رجوع")}</button><span>{bippoT("معاينة التيكي · ")}{width}{bippoT(" مم")}</span><button onClick={() => window.print()}>{bippoT("طباعة")}</button></div>}<article className="receipt-paper" dir={bippoDirection}>{branding?.logo && <img className="receipt-logo" src={branding.logo} alt="" />}<h1>{branding?.name || bippoT("محلك")}</h1>{branding?.address && <p>{branding.address}</p>}<p>{bippoT("تيكي متابعة الطلب")}</p><strong className="receipt-number">{order.number}</strong><p>{new Date(order.created_at).toLocaleString(bippoLocale)}</p>{code ? <>
+    <h2>{bippoT('كود المتابعة')}</h2>
+    <strong className="counter-code" dir="ltr">{code}</strong>
+    <p>{bippoT('امسح QR عند الكونتوار، دخل هذا الكود وفعّل التنبيه.')}</p>
+  </> : <>
+    <div className="receipt-qr"><QRCodeSVG value={url} size={220} level="M" marginSize={4} /></div>
+    <h2>{bippoT("امسح الكود وفعّل التنبيه")}</h2>
+  </>}<p>{bippoT("باش تعرف كي يوجد طلبك، بلا تحميل تطبيق.")}</p><p>{pickupText(branding?.pickup_message) || bippoT("تقدر تجي تديه من الكونتوار.")}</p><small>{code ? bippoT("كود المتابعة صالح 24 ساعة من إنشاء الطلب.") : bippoT("الرابط خاص بطلبك وصالح 24 ساعة من إنشائه.")}<br />{bippoT("تنبيه الهاتف حسب الاتصال والأذونات.")}</small><footer><Brand linked={false} /><span>{bippoT("تيكي متابعة، ماشي فاتورة دفع.")}</span></footer></article></div>, document.body);
 }

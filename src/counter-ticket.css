@@ -1,0 +1,44 @@
+.counter-guest {
+  max-width: 480px;
+  padding-block: 32px;
+}
+.counter-guest > .panel {
+  margin-top: 24px;
+}
+.counter-guest form,
+.counter-settings {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.counter-poster {
+  width: min(100%, 360px);
+  padding: 20px;
+  margin-inline: auto;
+  border: 1px solid #dce7dd;
+  border-radius: 20px;
+  color: #153c38;
+  background: #fff;
+  text-align: center;
+}
+.counter-poster > svg {
+  display: block;
+  margin-inline: auto;
+  max-width: 100%;
+  height: auto;
+}
+.counter-code {
+  display: block;
+  font-family: monospace;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+@media print {
+  .counter-print > .counter-poster {
+    width: 105mm;
+    max-width: 100%;
+    border-color: #000;
+    color: #000;
+    break-inside: avoid;
+  }
+}

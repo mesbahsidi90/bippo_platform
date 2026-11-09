@@ -8,7 +8,8 @@ export const defaults = {
   address: '',
   pickup_message: bippoT("تقدر تجي تديه من الكونتوار."),
   logo: '',
-  google_review_url: ''
+  google_review_url: '',
+  tracking_mode: 'order'
 };
 export async function getSettings() {
   if (!cloud) return {
@@ -38,7 +39,8 @@ export async function saveSettings(value) {
     address: value.address.trim(),
     pickup_message: value.pickup_message.trim(),
     logo: value.logo,
-    google_review_url: reviewUrl(value.google_review_url || '')
+    google_review_url: reviewUrl(value.google_review_url || ''),
+    tracking_mode: value.tracking_mode === 'counter' ? 'counter' : 'order'
   };
   if (!data.name || data.name.length > 100) throw new Error(bippoT("دخل اسم المحل، حتى 100 حرف."));
   if (!cloud) {

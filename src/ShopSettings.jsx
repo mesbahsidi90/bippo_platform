@@ -3,16 +3,22 @@ import React, { useState, useEffect } from 'react';
 import { LogOut, Save, ImagePlus } from 'lucide-react';
 import { cloud, db } from './store';
 import { getSettings, saveSettings, readLogo } from './shopSettings';
+import { CounterPoster } from './CounterTicket';
 import './shop-settings.css';
 export default function ShopSettings() {
   const [form, setForm] = useState(null),
     [error, setError] = useState(''),
     [message, setMessage] = useState(''),
     [busy, setBusy] = useState(false),
-    [email, setEmail] = useState('');
+    [email, setEmail] = useState(''),
+    [savedShop, setSavedShop] = useState(null);
   useEffect(() => {
     let alive = true;
-    getSettings().then(v => alive && setForm(v)).catch(e => alive && setError(e.message));
+    getSettings().then(value => {
+      if (!alive) return;
+      setForm(value);
+      setSavedShop(value);
+    }).catch(e => alive && setError(e.message));
     db?.auth.getUser().then(({
       data
     }) => alive && setEmail(data.user?.email || ''));
@@ -33,7 +39,9 @@ export default function ShopSettings() {
       setError('');
       setMessage('');
       try {
-        setForm(await saveSettings(form));
+        const saved = await saveSettings(form);
+        setForm(saved);
+        setSavedShop(saved);
         setMessage(bippoT("تسجّلت إعدادات المحل."));
       } catch (e) {
         setError(e.message);
@@ -41,6 +49,17 @@ export default function ShopSettings() {
         setBusy(false);
       }
     }}>
+ <section className="shop-review-section">
+   <label>{bippoT('طريقة متابعة الطلب')}
+     <select disabled={busy} value={form.tracking_mode} onChange={e => update('tracking_mode', e.target.value)}>
+       <option value="order">{bippoT('QR لكل طلب (افتراضي)')}</option>
+       <option value="counter">{bippoT('QR ثابت عند الكونتوار')}</option>
+     </select>
+   </label>
+   <p>{form.tracking_mode === 'counter'
+     ? bippoT('بعد الحفظ، اطبع الملصق مرة وحدة. مع كل طلب، سلّم للزبون كود المتابعة.')
+     : bippoT('الزبون يمسح QR من تيكي الطلب ويفتح طلبه مباشرة.')}</p>
+ </section>
  <div className="shop-logo-editor">{form.logo ? <img src={form.logo} alt={bippoT("شعار المحل")} /> : <span className="shop-logo-placeholder"><ImagePlus /></span>}<div><label>{bippoT("شعار المحل")}<input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} onChange={async e => {
               const file = e.target.files?.[0];
               if (!file) return;
@@ -57,7 +76,7 @@ export default function ShopSettings() {
             }} /></label><small>{bippoT("PNG، JPG أو WebP · حتى 2 ميغا")}</small>{form.logo && <button type="button" className="icon-button" onClick={() => update('logo', '')}>{bippoT("نحّي الشعار")}</button>}</div></div>
  <div className="shop-settings-grid"><label>{bippoT("اسم المحل")}<input required maxLength={100} value={form.name} onChange={e => update('name', e.target.value)} /></label><label>{bippoT("المدينة")}<input maxLength={100} value={form.city} onChange={e => update('city', e.target.value)} /></label></div>
  <label>{bippoT("عنوان المحل")}<input maxLength={200} value={form.address} onChange={e => update('address', e.target.value)} /></label><label>{bippoT("رسالة الاستلام للزبون")}<input required maxLength={180} value={form.pickup_message} onChange={e => update('pickup_message', e.target.value)} /></label><section className="shop-review-section"><h3>{bippoT("تقييمات Google بعد الاستلام")}</h3><p>{bippoT("الزبون يلقى رابط التقييم كي تعلّم الطلب «تسلّم الطلب». نفس الدعوة تظهر لجميع الزبائن، بلا فرز حسب الرضا.")}</p><label>{bippoT("رابط تقييم محلك على Google")}<input type="url" dir="ltr" maxLength={2048} placeholder="https://g.page/r/…/review" value={form.google_review_url || ''} onChange={e => update('google_review_url', e.target.value)} /></label><small>{bippoT("اختياري. من ملف محلك في Google: التقييمات ← الحصول على المزيد من التقييمات ← نسخ الرابط. ")}<a href="https://support.google.com/business/answer/16816815" target="_blank" rel="noopener noreferrer">{bippoT("شرح Google")}</a>{bippoT(". نحّي الرابط إذا حبيت توقف الدعوة.")}</small></section><button className="button" disabled={busy}><Save size={18} /> {busy ? bippoT("نحفظو…") : bippoT("حفظ الإعدادات")}</button>{message && <p role="status" className="notice">{message}</p>}
- </form>}<div className="shop-account"><h3>{bippoT("الحساب")}</h3>{email && <p dir="ltr">{email}</p>}{cloud && <a className="button outline" href="#account">{bippoT("تغيير كلمة المرور")}</a>}<button className="button logout-button" disabled={busy} onClick={async () => {
+ </form>}{savedShop?.tracking_mode === 'counter' && <CounterPoster shop={savedShop} />}<div className="shop-account"><h3>{bippoT("الحساب")}</h3>{email && <p dir="ltr">{email}</p>}{cloud && <a className="button outline" href="#account">{bippoT("تغيير كلمة المرور")}</a>}<button className="button logout-button" disabled={busy} onClick={async () => {
         setBusy(true);
         setError('');
         try {
